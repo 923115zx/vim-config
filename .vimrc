@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-09-06 10:14:32 PM
+"      LastModified                : 2017-09-07 05:50:29 PM
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -32,7 +32,7 @@ if &t_Co > 2 || has("gui_running")
 	set t_Co=256					
 	let g:solarized_termcolors=256
 endif
-" Want to change cursor shape when entering imode, failed.
+" Want to change cursor shape when entering imode, not work in xshell.
 "if &term =~ "xterm"
 "	let &t_SI = "\<ESC>]50;CursorShape=1\x7"
 "	let &t_EI = "\<ESC>]50;CursorShape=0\x7"
@@ -64,8 +64,10 @@ set fileencoding=utf-8
 set fencs=utf-8,GB18030,ucs-bom,default,latin1
 filetype plugin indent on
 set completeopt=longest,menu,preview
+set wildmode=list:longest,full		" Command line completion list.
 set tabstop=4
 set shiftwidth=4
+set shiftround
 set mps+=<:>
 " Set fold with marker. zf--create fold. zo--open fold. zc--close fold.
 " zM--Close all folds. zR--open all folds.
