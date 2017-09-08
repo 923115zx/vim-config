@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-09-07 05:50:29 PM
+"      LastModified                : 2017-09-08 04:48:52 PM
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -67,7 +67,7 @@ set completeopt=longest,menu,preview
 set wildmode=list:longest,full		" Command line completion list.
 set tabstop=4
 set shiftwidth=4
-set shiftround
+set shiftround						" '<' and '>' operation will align to tab position.
 set mps+=<:>
 " Set fold with marker. zf--create fold. zo--open fold. zc--close fold.
 " zM--Close all folds. zR--open all folds.
@@ -105,12 +105,17 @@ set autochdir
 :silent! nnoremap <unique> <Leader>p o/*<CR><BS><BS>*<CR>*/<ESC>kA<Space>
 :silent! inoremap <unique> <C-p> /*<CR><BS><BS>*<CR>*/<Up><Space>
 " Add single line comment to current position or start a commented new line. 
-" It support multiple filetypes.
-:silent! nnoremap <unique> <leader>o :call <SID>WriteComment()<CR>a
+" It support multiple filetypes. If encountered unknown filetype, it will do 
+" nothing but show errmsg.
+:silent! nnoremap <unique> <expr> <leader>o <SID>WriteComment()
 :silent! inoremap <unique> <C-o> <C-R>=<SID>WriteComment()<CR>
-" Auto Comment for line or lines.
+
+" Easy comment for line or lines. Works in nmode and vmode.
 let g:comment_trigger="<Leader>/"
+" Only works when one or more uncommented lines in selected lines. If all lines be
+" commented, it wouldn't uncomment them. TODO: improve later.
 let g:visual_uncomment_trigger="<Leader>r"
+
 exe ":silent! nnoremap <unique> <silent> " . g:comment_trigger . 
 			\" :call ToggleComment()<CR>"
 exe ":silent! vnoremap <unique> <silent> " . g:comment_trigger . 
@@ -135,33 +140,41 @@ let s:commentSymbols = {
 
 " Prepare to write a single line comment.
 func! s:WriteComment()
-	if &filetype != 'c' && &filetype != 'cpp'
-		let commentSymbol = s:commentSymbols[&filetype] . " "
-		let commentSymbol_n = commentSymbol
-	else
-		let commentSymbol_n = "\/\*  \*\/"
-		let commentSymbol = commentSymbol_n . "\<Left>\<Left>\<Left>"
+	if &filetype == ''
+		echom "Unknown filetype. Not support."
+		return ''
 	endif
+	let commentSymbol = &commentstring
+	let commentSymbol_n = substitute(commentSymbol, '\S\zs%s', ' ', '')
+	let commentInput = substitute(commentSymbol_n, '*\/\zs\s*$', 
+				\ "\<Left>\<Left>\<Left> ", '')
 	if 'i' == mode()
-		return commentSymbol
+		return commentInput
 	endif
-	normal o-
-	let cur_indent = col('.') - 1
-	call setline(line('.'), repeat("\t", cur_indent) . commentSymbol_n)
-	call cursor(0, cur_indent+3)
+	" nmode.
+	return 'o' . commentInput
+endfunc
+
+" Get commentstring for current filetype, replace '%s' to ' '.
+func! s:GetCommentString()
+	let cmstr = get(s:commentSymbols, &filetype, &commentstring)
+	if cmstr == '/*%s*/'
+		return '//'
+	endif
+	return substitute(cmstr, '%s', ' ', '')
 endfunc
 
 " Comment or uncomment current line.
 func! ToggleComment()
-	let commentSymbol = get(s:commentSymbols, &filetype, '0')
-	if commentSymbol == '0'
-		echo "Don't support add comment for filetype[" . &filetype . "]"
+	if &filetype == ''
+		echom "Unknown filetype, not support."
 		return
 	endif
 	" Do nothing to empty line.
 	if s:IsEmptyLine()
 		return
 	endif
+	let commentSymbol = s:GetCommentString()
 	let sym_len = strlen(commentSymbol)
 	let line_text = getline(".")
 	let cur_col = col(".")
@@ -210,7 +223,7 @@ endfunc
 " return 0.
 func! s:IsCommented()
 	let line_text = getline('.')
-	let COMMENTED_LINE = '^\s*' . s:commentSymbols[&filetype] . '.*$'
+	let COMMENTED_LINE = '^\s*' . s:GetCommentString() . '.*$'
 	if line_text =~ COMMENTED_LINE
 		return 1
 	endif
@@ -220,11 +233,11 @@ endfunc
 " Comments lines from first_line to last_line.
 func! s:ToggleComments(first_line, last_line)
 	" Find single line comment symbol for current filetype.
-	let commentSymbol = get(s:commentSymbols, &filetype, '0')
-	if commentSymbol == '0'
-		echo "Don't support add comment for filetype[" . &filetype . "]"
-		return
+	if &filetype == ''
+		echo "Unknown filetype, not support."
+		return ''
 	endif
+	let commentSymbol = s:GetCommentString()
 	call cursor(a:first_line, 0)
 	let first_line_text = getline('.')
 	" Pattern for finding first uncommented or none-empty line.
@@ -1229,7 +1242,7 @@ func! MoveLines(up)
 		let distance = v:count1
 	else a:up != 1
 		let up_or_down = '+'
-		let distance = v:count1 + last_line_nr - first_line_nr
+		let distance = v:count1 + last_line_nr - first_line_nr + 1
 	endif
 	exe first_line_nr . "," . last_line_nr . "move " . up_or_down . distance
 endfunc
