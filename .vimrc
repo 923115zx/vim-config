@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-09-08 04:48:52 PM
+"      LastModified                : 2017-09-08 11:44:28 PM
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -32,11 +32,12 @@ if &t_Co > 2 || has("gui_running")
 	set t_Co=256					
 	let g:solarized_termcolors=256
 endif
-" Want to change cursor shape when entering imode, not work in xshell.
-"if &term =~ "xterm"
-"	let &t_SI = "\<ESC>]50;CursorShape=1\x7"
-"	let &t_EI = "\<ESC>]50;CursorShape=0\x7"
-"endif
+" Want to change cursor shape to vertical bar when entering imode, and turn to 
+" block when return back to normal mode. Not work in xshell.
+if &term =~ "xterm"
+	let &t_SI = "\<ESC>]50;CursorShape=1\x7"
+	let &t_EI = "\<ESC>]50;CursorShape=0\x7"
+endif
 "set nowrapscan
 set nobackup
 set nowritebackup
@@ -1229,20 +1230,20 @@ endfunc
 " (14) Move lines.
 :silent! nnoremap <unique> <silent> <Leader>j :<C-u>exe 'move +' . v:count1<CR>
 :silent! nnoremap <unique> <silent> <Leader>k :<C-u>exe 'move -1-' . v:count1<CR>
-:silent! vnoremap <unique> <silent> <Leader>j <ESC>:call MoveLines(0)<CR>
-:silent! vnoremap <unique> <silent> <Leader>k <ESC>:call MoveLines(1)<CR>
-" Move lines as a block to up or down.
-func! MoveLines(up)
+:silent! vnoremap <unique> <silent> <Leader>j :<C-u>call MoveLines(0, v:count1)<CR>
+:silent! vnoremap <unique> <silent> <Leader>k :<C-u>call MoveLines(1, v:count1)<CR>
+" Move block up or down.
+func! MoveLines(up, count1)
 	normal `>
 	let last_line_nr = line('.')
 	normal `<
 	let first_line_nr = line('.')
 	if a:up == 1
 		let up_or_down = '-1-'
-		let distance = v:count1
-	else a:up != 1
+		let distance = a:count1
+	else 
 		let up_or_down = '+'
-		let distance = v:count1 + last_line_nr - first_line_nr + 1
+		let distance = a:count1 + last_line_nr - first_line_nr
 	endif
 	exe first_line_nr . "," . last_line_nr . "move " . up_or_down . distance
 endfunc
@@ -1260,14 +1261,24 @@ endfunc
 :silent! vnoremap <unique> > >gv
 
 " (18) Restore cursor when openning file.
-autocmd BufReadPost *
-    \ if line("'\"") > 1 && line("'\"") <= line("$") |
-    \   exe "normal! g`\"" |
-    \ endif
+augroup vim_config
+	au!
+	autocmd BufReadPost *
+		\ if line("'\"") > 1 && line("'\"") <= line("$") |
+		\   exe "normal! g`\"" |
+		\ endif
+augroup end
 
 " (19) Adding empty lines. Above and below.
 :silent! nnoremap <unique> [<Space> :<C-u>put! =repeat(nr2char(10), v:count1)<CR>
 :silent! nnoremap <unique> ]<Space> :<C-u>put =repeat(nr2char(10), v:count1)<CR>
+
+" (20) Remove trailing chars before line end. Auto triggerred after buffer be loaded 
+" 		and before buffer be writen.
+augroup vim_config
+	autocmd BufReadPost * :%s/\s\+$//e
+	autocmd BufWritePre * :%s/\s\+$//e
+augroup end
 
 " +----------------------------------------------------------------------+
 " |                        PIECEMEAL FEATURE END                         |
@@ -1282,8 +1293,7 @@ autocmd BufReadPost *
 "	BufReadPre/BufReadPost-----starting to edit an existing file.
 "	FilterReadPre/FilterReadPost-----read the temp file with filter output.
 "	FileReadPre/FileReadPost----any other file read.
-augroup TitleSetter
-	au!
+augroup vim_config
 	autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 	autocmd BufNewFile * :call <SID>CreateFile()
 "	autocmd BufNewFile *.asm :call BuildSandbox()
@@ -1479,7 +1489,7 @@ let g:ycm_key_list_select_completion = []
 let g:ycm_key_list_previous_completion = []
 let g:ycm_confirm_extra_conf = 0
 let g:ycm_goto_buffer_command = 'horizontal-split'
-let g:ycm_warning_symbol = '>'
+let g:ycm_warning_symbol = '->'
 let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
 let g:ycm_always_populate_location_list = 1
 let g:ycm_echo_current_diagnostic = 1
