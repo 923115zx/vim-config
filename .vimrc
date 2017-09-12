@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-09-08 11:44:28 PM
+"      LastModified                : 2017-09-12 09:13:07 PM
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -29,10 +29,10 @@ if &t_Co > 2 || has("gui_running")
 	syntax enable
 	set hlsearch
 	" Assume support 256 colors. Maybe it will cause bug. But whatever.
-	set t_Co=256					
+	set t_Co=256
 	let g:solarized_termcolors=256
 endif
-" Want to change cursor shape to vertical bar when entering imode, and turn to 
+" Want to change cursor shape to vertical bar when entering imode, and turn to
 " block when return back to normal mode. Not work in xshell.
 if &term =~ "xterm"
 	let &t_SI = "\<ESC>]50;CursorShape=1\x7"
@@ -75,7 +75,7 @@ set mps+=<:>
 set foldmethod=marker
 "set complete-=i 		" Slow down search speed in large project. Abandon cuz ycm.
 let mapleader = "t"
-set history=50
+set history=1000
 set ruler
 set viminfo='20,\"50
 set backspace=indent,eol,start
@@ -89,7 +89,7 @@ set scrolloff=2
 "ctags  -I __THROW  -I __THROWNL -I __attribute_pure__ -I __nonnull -I __attribute__ -R --c-kinds=+p --fields=+iaS --extra=+q --language-force=C /usr/include/
 " }}}
 " Keep finding tags file up till to /, the first encountered tags file will be used.
-set tags=~/.lib_tags,tags;		
+set tags=~/.lib_tags,tags;
 set autochdir
 " +----------------------------------------------------------------------+
 " |                         COMMON SETTINGS END                          |
@@ -105,8 +105,8 @@ set autochdir
 " to current cursor position. Other filetype use it probably will cause a glitch.
 :silent! nnoremap <unique> <Leader>p o/*<CR><BS><BS>*<CR>*/<ESC>kA<Space>
 :silent! inoremap <unique> <C-p> /*<CR><BS><BS>*<CR>*/<Up><Space>
-" Add single line comment to current position or start a commented new line. 
-" It support multiple filetypes. If encountered unknown filetype, it will do 
+" Add single line comment to current position or start a commented new line.
+" It support multiple filetypes. If encountered unknown filetype, it will do
 " nothing but show errmsg.
 :silent! nnoremap <unique> <expr> <leader>o <SID>WriteComment()
 :silent! inoremap <unique> <C-o> <C-R>=<SID>WriteComment()<CR>
@@ -114,15 +114,15 @@ set autochdir
 " Easy comment for line or lines. Works in nmode and vmode.
 let g:comment_trigger="<Leader>/"
 " Only works when one or more uncommented lines in selected lines. If all lines be
-" commented, it wouldn't uncomment them. TODO: improve later.
+" commented, it wouldn't uncomment them.
 let g:visual_uncomment_trigger="<Leader>r"
 
-exe ":silent! nnoremap <unique> <silent> " . g:comment_trigger . 
-			\" :call ToggleComment()<CR>"
-exe ":silent! vnoremap <unique> <silent> " . g:comment_trigger . 
-			\" <ESC>:call <SID>ToggleComments_visual()<CR>"
+exe ":silent! nnoremap <unique> <silent> " . g:comment_trigger .
+			\ " :call ToggleComment()<CR>"
+exe ":silent! vnoremap <unique> <silent> " . g:comment_trigger .
+			\ " :<C-u>call <SID>ToggleComments_visual()<CR>"
 exe ":silent! vmap <unique> <silent> " . g:visual_uncomment_trigger .
-			\" " . g:comment_trigger . "gv" . g:comment_trigger
+			\ " :<C-u>call UncommentLines(line(\"'<\"), line(\"'>\"))<CR>"
 :command! -range Cm <line1>,<line2>call <SID>ToggleComments_range()
 
 let s:commentSymbols = {
@@ -145,9 +145,11 @@ func! s:WriteComment()
 		echom "Unknown filetype. Not support."
 		return ''
 	endif
+
+	" Use commentstring instead of s:GetCommentString. Means use /*%s*/.
 	let commentSymbol = &commentstring
 	let commentSymbol_n = substitute(commentSymbol, '\S\zs%s', ' ', '')
-	let commentInput = substitute(commentSymbol_n, '*\/\zs\s*$', 
+	let commentInput = substitute(commentSymbol_n, '*\/\zs\s*$',
 				\ "\<Left>\<Left>\<Left> ", '')
 	if 'i' == mode()
 		return commentInput
@@ -175,12 +177,13 @@ func! ToggleComment()
 	if s:IsEmptyLine()
 		return
 	endif
+
 	let commentSymbol = s:GetCommentString()
 	let sym_len = strlen(commentSymbol)
 	let line_text = getline(".")
 	let cur_col = col(".")
-	" Where the comment symbol be writen in this line, 0 means not commented
-	" or empty line.
+
+	" Where the comment symbol be writen in this line, 0 means not commented or empty line.
 	let first_comment_pos = strlen(matchstr(line_text, '^\s*' . commentSymbol))
 	if first_comment_pos == 0
 		" Uncommented or empty line.
@@ -222,8 +225,8 @@ endfunc
 " Check if current line is commented. return 1 when it's commented, 0 uncommented.
 " If current line is empty line(contains \s is not a empty line), function will
 " return 0.
-func! s:IsCommented()
-	let line_text = getline('.')
+func! s:IsCommented(...)
+	let line_text = a:0 == 0 ? getline('.') : getline(a:1)
 	let COMMENTED_LINE = '^\s*' . s:GetCommentString() . '.*$'
 	if line_text =~ COMMENTED_LINE
 		return 1
@@ -233,14 +236,15 @@ endfunc
 
 " Comments lines from first_line to last_line.
 func! s:ToggleComments(first_line, last_line)
-	" Find single line comment symbol for current filetype.
 	if &filetype == ''
 		echo "Unknown filetype, not support."
 		return ''
 	endif
+	" Find single line comment symbol for current filetype.
 	let commentSymbol = s:GetCommentString()
 	call cursor(a:first_line, 0)
 	let first_line_text = getline('.')
+
 	" Pattern for finding first uncommented or none-empty line.
 	let becommented_pat = '^\(\s*\(' . s:EscapeStr(commentSymbol) . '\)\|$\)\@!'
 	" Searching starts at a:first_line + 1. So need to separately check a:first_line.
@@ -249,31 +253,26 @@ func! s:ToggleComments(first_line, last_line)
 	else
 		let firstUncommentedLine = search(becommented_pat, 'nW')
 	endif
+
 	" If no line that match the condition be found, search will return 0.
 	if firstUncommentedLine == 0
 		" To avoid that the a:last_line is the last line of current buffer.
 		let firstUncommentedLine = line('$') + 1
 	endif
+
 	" Decide which function would be called and run the cmd for every line in range.
-	let commentCmd = 'call ToggleComment()'
-	if firstUncommentedLine <= a:last_line
-		let commentCmd = 'call s:CommentCurLine()'
-	endif
+	let commentCmd = firstUncommentedLine > a:last_line ?
+				\ 'call ToggleComment()' : 'call s:CommentCurLine()'
 	for i in range(a:first_line, a:last_line)
 		exe commentCmd
 		normal j
 	endfor
-"	echo becommented_pat." firstUncommentedLine=".firstUncommentedLine
 endfunc
 
 " Check a line is empty or not. If no args offered, check current line, or check
 " the line at the given line number.
 func! s:IsEmptyLine(...)
-	if a:0 == 0
-		let line_text = getline('.')
-	else
-		let line_text = getline(a:1)
-	endif
+	let line_text = a:0 == 0 ? getline('.') : getline(a:1)
 	if line_text =~ '^\s*$'
 		return 1
 	endif
@@ -301,9 +300,20 @@ func! s:CommentCurLine()
 	if s:IsEmptyLine() || s:IsCommented()
 		return
 	endif
-	let commentSymbol = s:commentSymbols[&filetype]
+	let commentSymbol = s:GetCommentString()
 	exe "s\/\^\/" . s:EscapeStr(commentSymbol) . "\/g"
 endfunc
+
+" Uncomment for a range.
+func! UncommentLines(first_line, last_line)
+	let commentSymbol = s:GetCommentString()
+	for lnr in range(a:first_line, a:last_line)
+		if !s:IsEmptyLine(lnr) && s:IsCommented(lnr)
+			exe lnr . 's/^\s*\zs' . s:EscapeStr(commentSymbol) . '//g'
+		endif
+	endfor
+endfunc
+
 " +----------------------------------------------------------------------+
 " |                           EASY COMMENT END                           |
 " +----------------------------------------------------------------------+
@@ -351,9 +361,7 @@ func! AddInclude(sysheader)
 			exe "normal o#include " . l:parenthese
 			return
 		endif
-"	elseif curmode == 'V' 	"Visual by lines.
 	endif
-"	echo "Add include only available in Insert, Normal and Visual by lines modes."
 	echo "Add include only available in Insert, Normal modes."
 endfunc
 " +----------------------------------------------------------------------+
@@ -388,6 +396,7 @@ func! s:DeleteParentheses()
 	let cur_col = cur_pos[2]
 	let line_text = getline('.')
 	let char_under_cursor = line_text[cur_pos[2]-1]
+
 	" i==0 is open-parenthesis, i==1 is close-parenthesis.
 	for i in range(2)
 		if get(s:parentheses[i], char_under_cursor, 'n') != 'n'
@@ -480,7 +489,7 @@ endfunc
 " but shows msg in command line.
 :silent! nnoremap <unique> <silent> <Leader>c :call <SID>Quit_scb()<CR>
 
-" Vertical split current window, adjust right window mapped file's part 
+" Vertical split current window, adjust right window mapped file's part
 " and set them scrollbind.
 func! s:Split_scb()
 	let cur_tab_win_count = winnr('$')
@@ -498,10 +507,10 @@ endfunc
 " Cancel split and scrollbind effect. Close the window that with earlier lines.
 " XXX: For make sure the window layout, first I want to use screenrow to get there,
 " 		but the screenrow and screencol are designed for debug, they are not proper
-" 		in function. Then I choose to use winline, this function could get the 
+" 		in function. Then I choose to use winline, this function could get the
 " 		screen line of the cursor in the window. I move cursor to line1, then check
-" 		if winline() == 1. It's a little bit verbose, we also could use &lines and 
-" 		&columns to check if the window reach the screen's edge. Maybe there is 
+" 		if winline() == 1. It's a little bit verbose, we also could use &lines and
+" 		&columns to check if the window reach the screen's edge. Maybe there is
 " 		better way to do it.
 func! s:Quit_scb()
 	if winnr('$') != 2
@@ -582,7 +591,7 @@ func! Split_diff(target, hex)
 		echo "Too many windows on current tabpage. Should <=2."
 		return
 	endif
-	if a:target == "" 
+	if a:target == ""
 		if cur_tab_win_nr == 2
 			call MakeDiff(a:hex)
 			return
@@ -648,15 +657,15 @@ let s:pairedSymbols = {
 " Add maps for all keys in s:pairedSymbols.
 func! s:RegisterPairedSymbols()
 	for lsymbol in keys(s:pairedSymbols)
-		if lsymbol != "'" 
-			exe "silent! inoremap " . lsymbol . " <C-R>=InputPairedSymbols('" 
+		if lsymbol != "'"
+			exe "silent! inoremap " . lsymbol . " <C-R>=InputPairedSymbols('"
 						\ . lsymbol . "')<CR>"
-			exe "silent! vnoremap <Leader>" . lsymbol . 
+			exe "silent! vnoremap <Leader>" . lsymbol .
 						\ " <ESC>:call AddParentheseForSelect('" . lsymbol . "')<CR>"
 		else
-			exe "silent! inoremap " . lsymbol . " <C-R>=InputPairedSymbols(\"" 
+			exe "silent! inoremap " . lsymbol . " <C-R>=InputPairedSymbols(\""
 						\ . lsymbol . "\")<CR>"
-			exe "silent! vnoremap <Leader>" . lsymbol . 
+			exe "silent! vnoremap <Leader>" . lsymbol .
 						\ " <ESC>:call AddParentheseForSelect(\"" . lsymbol . "\")<CR>"
 		endif
 	endfor
@@ -689,7 +698,7 @@ func! InputPairedSymbols(lsymbol)
 	if get(s:commentSymbols, &filetype, '0') == '0'
 		return a:lsymbol
 	endif
-	" Commented line will not complete. And the <TAB> still work, it is using to 
+	" Commented line will not complete. And the <TAB> still work, it is using to
 	" avoid input double "'" in "someone's something".
 	if s:IsCommented() == 1
 		return a:lsymbol
@@ -880,7 +889,7 @@ func! MyComplete()
 				if chunkType == 'namespace'
 				" Only c/c++ has namespace. so just use c style brick comment.
 					let extra_comment = " \/\* namespace " . GetChunkName(cur_line) . " \*\/"
-					return pum_access . replacement . extra_comment . (ifback ? cursor_back 
+					return pum_access . replacement . extra_comment . (ifback ? cursor_back
 								\. repeat("\<LEFT>", strlen(extra_comment)) : "")
 				endif
 				return pum_access . replacement . ';' . (ifback ? cursor_back . "\<LEFT>" : "")
@@ -957,7 +966,7 @@ func! GetIndentCount(lnr)
 	return strlen(matchstr(getline(a:lnr), '^\t*'))
 endfunc
 
-" Must be called in case of recent two lines contain 'namespace', 'class', 
+" Must be called in case of recent two lines contain 'namespace', 'class',
 " 'struct' or 'enum'.
 func! GetChunkName(lnr)
 	for i in range(2)
@@ -973,7 +982,7 @@ func! GetChunkName(lnr)
 	return ''
 endfunc
 
-" <C-R> and <expr> both can call function in insert mode, but they have 
+" <C-R> and <expr> both can call function in insert mode, but they have
 " some small differences. When using <expr> to decorate map and rhs is
 " function, then this function is not allowed to change buffer text.
 ":silent! inoremap <unique> <silent> <expr> <TAB> <SID>MyComplete()
@@ -1031,7 +1040,7 @@ exe ":silent! vnoremap <unique> <C-Right> " . g:jumpRange . "<C-e>"
 let g:moveDenominator=6		" 3~10
 let g:moveLeft="_"
 let g:moveRight="+"
-let g:find_="<C-g>" 		" use :f  
+let g:find_="<C-g>" 		" use :f
 exe ":silent! nnoremap <unique> " . g:find_ . " f_"
 exe ":silent! vnoremap <unique> " . g:find_ . " f_"
 exe ":silent! nnoremap <unique> <expr> <silent> ".g:moveLeft." MoveSwing(1)"
@@ -1087,12 +1096,12 @@ func! s:UnableToFind()
 	let wontbefound = repeat('vimrc', 4)
 	return wontbefound
 endfunc
-" (6) Omaps. Following 3 omaps works for parenthese. They work when left and right 
+" (6) Omaps. Following 3 omaps works for parenthese. They work when left and right
 " parenthese both in one line.
 
 " Works only when cursor in parenthese, effect to the content int the "()".
 :silent! onoremap <unique> p i(
-" Works when cursor is at left out of a parenthese, effect to the content in the 
+" Works when cursor is at left out of a parenthese, effect to the content in the
 " outer "()".
 :silent! onoremap <unique> i :<C-u>normal! f(vi(<cr>
 " Like above map, but effects to the content in the inner "()".
@@ -1216,7 +1225,7 @@ func! s:BuildSection(headline)
 	endif
 	let comment_start = s:commentSymbols[&filetype] . " "
 	let first_line = comment_start . "+" . repeat("-", sectionLen) . "+"
-	let second_line = comment_start . "|" . repeat(" ", rest_len1) . a:headline . 
+	let second_line = comment_start . "|" . repeat(" ", rest_len1) . a:headline .
 				\repeat(" ", rest_len2) . "|"
 	let third_line = comment_start . "+" . repeat("-", sectionLen) . "+"
 	call append(line("."), first_line)
@@ -1241,7 +1250,7 @@ func! MoveLines(up, count1)
 	if a:up == 1
 		let up_or_down = '-1-'
 		let distance = a:count1
-	else 
+	else
 		let up_or_down = '+'
 		let distance = a:count1 + last_line_nr - first_line_nr
 	endif
@@ -1273,11 +1282,15 @@ augroup end
 :silent! nnoremap <unique> [<Space> :<C-u>put! =repeat(nr2char(10), v:count1)<CR>
 :silent! nnoremap <unique> ]<Space> :<C-u>put =repeat(nr2char(10), v:count1)<CR>
 
-" (20) Remove trailing chars before line end. Auto triggerred after buffer be loaded 
+" (20) Remove trailing chars before line end. Auto triggerred after buffer be loaded
 " 		and before buffer be writen.
 augroup vim_config
-	autocmd BufReadPost * :%s/\s\+$//e
-	autocmd BufWritePre * :%s/\s\+$//e
+	" BufReadPost will need user to confirm, so just keep BufWritePre au.
+"	autocmd BufReadPost * :%s/\s\+$//e
+	autocmd BufWritePre *
+		\ let cur_pos__ = getpos('.') |
+		\ :%s/\s\+$//e |
+		\ call setpos('.', cur_pos__)
 augroup end
 
 " +----------------------------------------------------------------------+
@@ -1388,7 +1401,7 @@ func! s:LastModFresh()
 	else
 		let l = line("$")
 	endif
-	exe "silent 1," . l . "g/LastModified/s/LastModified.*/LastModified" . s:Spaces(16) . ": " . 
+	exe "silent 1," . l . "g/LastModified/s/LastModified.*/LastModified" . s:Spaces(16) . ": " .
 				\ strftime("%Y-%m-%d %X")
 endfunc
 " +----------------------------------------------------------------------+
@@ -1514,7 +1527,7 @@ let g:airline_powerline_fonts=1
 let g:airline#extensions#whitespace#enabled = 0
 let g:airline_section_y = '%{strftime("%x %R %a")}'
 let g:airline_section_x = ''
-" Themes. After experiment, 
+" Themes. After experiment,
 " Good :
 "	cool, lucius, base16, base16_bright, powerlineish, molokai, jellybeans
 " Not Bad :
@@ -1533,12 +1546,12 @@ let g:airline#extensions#tagbar#enabled = 0
 " |                         13. ASSIGNALIGNMENT                          |
 " +----------------------------------------------------------------------+
 " Copy from Damian Conway's artical. Start to learn regex pattern.
-function AlignAssignments ()
-	"Patterns needed to locate assignment operators...
+func! AlignAssignments ()
+	" Patterns needed to locate assignment operators...
 	let ASSIGN_OP   = '[-+*/%|&]\?=\@<!=[=~]\@!'
 	let ASSIGN_LINE = '^\(.\{-}\)\s*\(' . ASSIGN_OP . '\)\(.*\)$'
 
-	"Locate block of code to be considered (same indentation, no blanks)
+	" Locate block of code to be considered (same indentation, no blanks)...
 	let indent_pat = '^' . matchstr(getline('.'), '^\s*') . '\S'
 	let firstline  = search('^\%('. indent_pat . '\)\@!','bnW') + 1
 	let lastline   = search('^\%('. indent_pat . '\)\@!', 'nW') - 1
@@ -1546,33 +1559,32 @@ function AlignAssignments ()
 		let lastline = line('$')
 	endif
 
-	"Find the column at which the operators should be aligned...
-	let max_align_col = 0
-	let max_op_width  = 0
+	" Decompose lines at assignment operators...
+	let lines = []
 	for linetext in getline(firstline, lastline)
-		"Does this line have an assignment in it?
-		let left_width = match(linetext, '\s*' . ASSIGN_OP)
-
-		"If so, track the maximal assignment column and operator width...
-		if left_width >= 0
-			let max_align_col = max([max_align_col, left_width])
-
-			let op_width      = strlen(matchstr(linetext, ASSIGN_OP))
-			let max_op_width  = max([max_op_width, op_width+1])
+		let fields = matchlist(linetext, ASSIGN_LINE)
+		if len(fields)
+			call add(lines, {'lval':fields[1], 'op':fields[2], 'rval':fields[3]})
+		else
+			call add(lines, {'text':linetext,  'op':''                         })
 		endif
 	endfor
 
-	"Code needed to reformat lines so as to align operators...
-	let FORMATTER = '\=printf("%-*s%*s", max_align_col, submatch(1),
-				\                                    max_op_width,  submatch(2))'
+	" Determine maximal lengths of lvalue and operator...
+	let op_lines = filter(copy(lines),'!empty(v:val.op)')
+	let max_lval = max( map(copy(op_lines), 'strlen(v:val.lval)') ) + 1
+	let max_op   = max( map(copy(op_lines), 'strlen(v:val.op)'  ) )
 
-	" Reformat lines with operators aligned in the appropriate column...
-	for linenum in range(firstline, lastline)
-		let oldline = getline(linenum)
-		let newline = substitute(oldline, ASSIGN_LINE, FORMATTER, "")
+	" Recompose lines with operators at the maximum length...
+	let linenum = firstline
+	for line in lines
+		let newline = empty(line.op)
+					\ ? line.text
+					\ : printf("%-*s%*s%s", max_lval, line.lval, max_op, line.op, line.rval)
 		call setline(linenum, newline)
+		let linenum += 1
 	endfor
-endfunction
+endfunc
 :silent! nnoremap <unique> <silent> <Leader>= :call AlignAssignments()<CR>
 " +----------------------------------------------------------------------+
 " |                         ASSIGNALIGNMENT END                          |
