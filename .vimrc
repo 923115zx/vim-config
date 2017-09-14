@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-09-12 09:13:07 PM
+"      LastModified                : 2017-09-14 12:37:27 PM
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -916,7 +916,7 @@ let s:chunk_pattern_pairs = {
 " Parse current line and previous line to get this chunk's type.
 func! GetChunkType(lnr)
 	for i in range(2)
-		let line_text = getline(a:lnr)
+		let line_text = getline(a:lnr-i)
 		for [name, pattern] in items(s:chunk_pattern_pairs)
 			if line_text =~ pattern . '.*'
 				return name
