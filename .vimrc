@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-09-14 12:37:27 PM
+"      LastModified                : 2017-09-15 05:43:56 PM
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -91,6 +91,17 @@ set scrolloff=2
 " Keep finding tags file up till to /, the first encountered tags file will be used.
 set tags=~/.lib_tags,tags;
 set autochdir
+set virtualedit=block	" Block visual select could select blank area.
+set fileformats=unix,mac,dos
+set noshowmode			" Cmdline shows no what mode now, airline could do that.
+
+" Very funny feature, listchars. Copyed from Damian Conway's .vimrc.
+set listchars=tab:⇒·,trail:␣,nbsp:~"
+set nolist
+" Actually I don't know what it matchs.
+highlight InvisibleSpaces ctermfg=Black ctermbg=Black
+call matchadd('InvisibleSpaces', '\s\+\%#', 100)
+
 " +----------------------------------------------------------------------+
 " |                         COMMON SETTINGS END                          |
 " +----------------------------------------------------------------------+
@@ -109,7 +120,7 @@ set autochdir
 " It support multiple filetypes. If encountered unknown filetype, it will do
 " nothing but show errmsg.
 :silent! nnoremap <unique> <expr> <leader>o <SID>WriteComment()
-:silent! inoremap <unique> <C-o> <C-R>=<SID>WriteComment()<CR>
+:silent! inoremap <unique> <silent> <C-o> <C-R>=<SID>WriteComment()<CR>
 
 " Easy comment for line or lines. Works in nmode and vmode.
 let g:comment_trigger="<Leader>/"
@@ -1103,9 +1114,9 @@ endfunc
 :silent! onoremap <unique> p i(
 " Works when cursor is at left out of a parenthese, effect to the content in the
 " outer "()".
-:silent! onoremap <unique> i :<C-u>normal! f(vi(<cr>
+:silent! onoremap <unique> i :<C-u>normal! f(vi(<CR>
 " Like above map, but effects to the content in the inner "()".
-:silent! onoremap <unique> o :<C-u>normal! f)vi(<cr>
+:silent! onoremap <unique> o :<C-u>normal! f)vi(<CR>
 
 " (7) Delete word.
 :silent! nnoremap <unique> <Leader>[ daw
@@ -1292,6 +1303,24 @@ augroup vim_config
 		\ :%s/\s\+$//e |
 		\ call setpos('.', cur_pos__)
 augroup end
+
+" (21) Shows up or hidden tabs, trails and non-breakable space. (see line99)
+:silent! nnoremap <unique> <silent> zl :<C-u>call TriggerList()<CR>
+" Show listchars or hidden them.
+func! TriggerList()
+	if &list==1
+		set nolist
+	else
+		set list
+	endif
+endfunc
+
+" (22) Swap v and <C-v>.
+:silent! nnoremap v <C-v>
+:silent! nnoremap <C-v> v
+
+:silent! vnoremap v <C-v>
+:silent! vnoremap <C-v> v
 
 " +----------------------------------------------------------------------+
 " |                        PIECEMEAL FEATURE END                         |
@@ -1516,6 +1545,7 @@ let g:ycm_echo_current_diagnostic = 1
 ":nnoremap <unique> <Leader>f :YcmCompleter YcmQuickFixOpened<CR>
 
 " (4) Colorscheme
+" TODO: Add airline refresh to background change and contrast change.
 color modified_solarized
 
 " [----Powerline----]	(Abandoned, replaced by airline.) {{{
