@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-09-15 05:43:56 PM
+"      LastModified                : 2017-09-18 22:36:39
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -51,7 +51,8 @@ if has("gui_running")
 	behave mswin
 	au GUIEnter * set t_vb=				" No annoying flash.
 	autocmd GUIEnter * simalt ~x 		" Full screen when open gvim.
-	set guifont=Consolas:h12 			" self-define font in gui.
+"	set guifont=Consolas:h12 			" self-define font in gui.
+	set guifont=PTmono:h16 				" self-define font in gui.
 	set guioptions=						" No menu, no scrollbar, no nothing.
 "else
 "	if isdirectory("~/.vim/doc")
@@ -64,7 +65,7 @@ set encoding=utf-8
 set fileencoding=utf-8
 set fencs=utf-8,GB18030,ucs-bom,default,latin1
 filetype plugin indent on
-set completeopt=longest,menu,preview
+set completeopt=menu,menuone,noinsert,preview
 set wildmode=list:longest,full		" Command line completion list.
 set tabstop=4
 set shiftwidth=4
@@ -80,6 +81,7 @@ set ruler
 set viminfo='20,\"50
 set backspace=indent,eol,start
 set scrolloff=2
+set splitright 			" When use :vsp, then new window appears on right.
 "set paste				" This will destroy MyComplete effect, do not use.
 
 " ctags usage. {{{
@@ -334,17 +336,17 @@ endfunc
 " +----------------------------------------------------------------------+
 :silent! inoremap <unique> <C-F> __FUNCTION__
 :silent! inoremap <unique> <C-L> __LINE__
-:silent! nnoremap <unique> <Leader>n :call AddInclude(1)<CR>i
-:silent! nnoremap <unique> <Leader>y :call AddInclude(0)<CR>a
+:silent! nnoremap <unique> <silent> <Leader>n :call AddInclude(1)<CR>i
+:silent! nnoremap <unique> <silent> <Leader>y :call AddInclude(0)<CR>a
 " If pumvisible==1, <C-N> will be move selecting hi in popup menu, so we have to
 " close popup menu first before we use <C-N>.
-:silent! inoremap <unique> <C-N> <C-R>=AddInclude(1)<CR>
-:silent! inoremap <unique> <C-Y> <C-R>=AddInclude(0)<CR>
+:silent! inoremap <unique> <silent> <C-N> <C-R>=AddInclude(1)<CR>
+:silent! inoremap <unique> <silent> <C-Y> <C-R>=AddInclude(0)<CR>
 " Add include header preprocess text.
 func! AddInclude(sysheader)
 	if &filetype != 'c' && &filetype != 'cpp'
 		echo "Add include expr function only available in c/c++ file."
-		return
+		return ''
 	endif
 	if a:sysheader
 		let l:parenthese = "<>"
@@ -370,7 +372,7 @@ func! AddInclude(sysheader)
 			return
 		else
 			exe "normal o#include " . l:parenthese
-			return
+			return ''
 		endif
 	endif
 	echo "Add include only available in Insert, Normal modes."
@@ -669,14 +671,14 @@ let s:pairedSymbols = {
 func! s:RegisterPairedSymbols()
 	for lsymbol in keys(s:pairedSymbols)
 		if lsymbol != "'"
-			exe "silent! inoremap " . lsymbol . " <C-R>=InputPairedSymbols('"
+			exe "silent! inoremap <silent> " . lsymbol . " <C-R>=InputPairedSymbols('"
 						\ . lsymbol . "')<CR>"
-			exe "silent! vnoremap <Leader>" . lsymbol .
+			exe "silent! vnoremap <silent> <Leader>" . lsymbol .
 						\ " <ESC>:call AddParentheseForSelect('" . lsymbol . "')<CR>"
 		else
-			exe "silent! inoremap " . lsymbol . " <C-R>=InputPairedSymbols(\""
+			exe "silent! inoremap <silent> " . lsymbol . " <C-R>=InputPairedSymbols(\""
 						\ . lsymbol . "\")<CR>"
-			exe "silent! vnoremap <Leader>" . lsymbol .
+			exe "silent! vnoremap <silent> <Leader>" . lsymbol .
 						\ " <ESC>:call AddParentheseForSelect(\"" . lsymbol . "\")<CR>"
 		endif
 	endfor
@@ -684,7 +686,7 @@ func! s:RegisterPairedSymbols()
 endfunc
 call s:RegisterPairedSymbols()
 " Map <BS> to delete '()' or other empty parenthese. <C-h> == <BS>
-:silent! inoremap <unique> <silent>	<expr> <C-h> DeletePairedSymbols()
+:silent! inoremap <unique> <silent>	<expr> <BS> DeletePairedSymbols()
 " Map <C-\> to delete right part of '()' or other empty parenthese.
 :silent! inoremap <unique> <silent> <expr> <C-\> DeleteRedundandRightSymbol()
 
@@ -857,7 +859,9 @@ func! MyComplete()
 	let pum_access = ""
 	if pumvisible()
 		"return "\<C-N>"
-"		return "\<TAB>"		" Ycm provides semantic complete, no need return CRTL-N here.
+		if !exists("g:loaded_youcompleteme")
+			return "\<C-Y>\<TAB>"		" Ycm provides semantic complete, no need return CRTL-N here.
+		endif
 "		return "\<C-Y>\<ESC>a" 	 " Choose current highlighted option, and quit pupup menu.
 		let pum_access = "\<C-Y>\<ESC>a"
 	endif
@@ -1041,13 +1045,15 @@ exe ":silent! vnoremap <unique> <C-k> " . g:jumpRange . "k"
 :silent! nnoremap <unique> <Leader>h ^
 :silent! vnoremap <unique> <Leader>h ^
 :silent! nnoremap <unique> <Leader>l $
-:silent! vnoremap <unique> <Leader>l $
-" Fast rolling the page. <S-Up> and <S-Down> are not work, and vimscript did't provide
-" <C-Up> and <C-Down>, so I have to choose <C-Left> and <C-Right>.
-exe ":silent! nnoremap <unique> <C-Left>  " . g:jumpRange . "<C-y>"
-exe ":silent! vnoremap <unique> <C-Left>  " . g:jumpRange . "<C-y>"
-exe ":silent! nnoremap <unique> <C-Right> " . g:jumpRange . "<C-e>"
-exe ":silent! vnoremap <unique> <C-Right> " . g:jumpRange . "<C-e>"
+" In visual mode, $ will come to \n, so here we go backward a little bit.
+:silent! vnoremap <unique> <Leader>l $h
+
+" Fast rolling the page. The key 'U' I never used, and the key 'D' is the same with
+" 'x', use them to move up and down g:jumpRange lines.
+exe ":silent! nnoremap <unique> U " . g:jumpRange . "<C-y>"
+exe ":silent! nnoremap <unique> B " . g:jumpRange . "<C-e>"
+exe ":silent! nnoremap <unique> U " . g:jumpRange . "<C-y>"
+exe ":silent! nnoremap <unique> B " . g:jumpRange . "<C-e>"
 let g:moveDenominator=6		" 3~10
 let g:moveLeft="_"
 let g:moveRight="+"
@@ -1379,11 +1385,11 @@ func! s:CreateFile()
 	call append(line('$')-1, comm_prefix . comm_repeat .
 				\s:Spaces(6) . "Author" . s:Spaces(22) .": Zhao Xin")
 	call append(line('$')-1, comm_prefix . comm_repeat .
-				\s:Spaces(6) . "CreateTime" . s:Spaces(18) . ": " . strftime("%Y-%m-%d %X"))
+				\s:Spaces(6) . "CreateTime" . s:Spaces(18) . ": " . strftime("%Y-%m-%d %T"))
 	call append(line('$')-1, comm_prefix . comm_repeat .
 				\s:Spaces(6) . "VIM" . s:Spaces(25) . ": ts=" . &ts . ", sw=" . &sw)
 	call append(line('$')-1, comm_prefix . comm_repeat .
-				\s:Spaces(6) . "LastModified" . s:Spaces(16) . ": " . strftime("%Y-%m-%d %X"))
+				\s:Spaces(6) . "LastModified" . s:Spaces(16) . ": " . strftime("%Y-%m-%d %T"))
 	call append(line('$')-1, comm_prefix . comm_repeat)
 	call append(line('$')-1, comm_prefix . repeat(comm_repeat, bottom_len) . comm_simbol)
 	" Specify bash for shell.
@@ -1431,7 +1437,7 @@ func! s:LastModFresh()
 		let l = line("$")
 	endif
 	exe "silent 1," . l . "g/LastModified/s/LastModified.*/LastModified" . s:Spaces(16) . ": " .
-				\ strftime("%Y-%m-%d %X")
+				\ strftime("%Y-%m-%d %T")
 endfunc
 " +----------------------------------------------------------------------+
 " |                        TITLE AUTO SETTER END                         |
