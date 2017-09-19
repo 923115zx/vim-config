@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-09-19 09:55:52
+"      LastModified                : 2017-09-19 11:15:43
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -687,8 +687,15 @@ func! s:RegisterPairedSymbols()
 	:silent! vnoremap <Leader>{ <ESC>:call AddParentheseForSelect('{')<CR>
 endfunc
 call s:RegisterPairedSymbols()
-" Map <BS> to delete '()' or other empty parenthese. <C-h> == <BS>
-:silent! inoremap <unique> <silent>	<expr> <BS> DeletePairedSymbols()
+
+" Map <BS> to delete '()' or other empty parenthese. In theory, <C-h> == <BS>,
+"  but actually mac doesn't recognize <C-h>, and rhel doesn't recognize <BS>.
+let OS = system("\uname")
+let BS = '<C-h>'
+if OS =~ "Darwin.*"
+	let BS = '<BS>'
+endif
+exe ":silent! inoremap <unique> <silent> <expr> " . BS . " DeletePairedSymbols()"
 " Map <C-\> to delete right part of '()' or other empty parenthese.
 :silent! inoremap <unique> <silent> <expr> <C-\> DeleteRedundandRightSymbol()
 
