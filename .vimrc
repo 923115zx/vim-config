@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-09-18 22:36:39
+"      LastModified                : 2017-09-19 09:55:52
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -65,7 +65,9 @@ set encoding=utf-8
 set fileencoding=utf-8
 set fencs=utf-8,GB18030,ucs-bom,default,latin1
 filetype plugin indent on
-set completeopt=menu,menuone,noinsert,preview
+" Vim7.4 has no noinsert and noselect option for cot.
+"set completeopt=menu,menuone,noinsert,preview
+set completeopt=menu,menuone,preview
 set wildmode=list:longest,full		" Command line completion list.
 set tabstop=4
 set shiftwidth=4
