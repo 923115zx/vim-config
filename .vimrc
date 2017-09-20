@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-09-20 20:45:40
+"      LastModified                : 2017-09-20 22:17:47
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -25,6 +25,14 @@ set cursorcolumn
 " Colorscheme solarized global variables.
 let g:solarized_termcolors=&t_Co
 let g:solarized_contrast="high"
+let g:bgToggleKey = "<F6>"
+let g:contraToggleKey = "<F7>"
+:silent! nmap <silent> <unique> <F3> <F6>:AirlineRefresh<CR>
+:silent! imap <unique> <silent> <F3> <F6><ESC>:AirlineRefresh<CR>
+:silent! vmap <unique> <silent> <F3> <F6>:<C-u>AirlineRefresh<CR>gv
+:silent! nmap <silent> <unique> <F4> <F7>:AirlineRefresh<CR>
+:silent! imap <unique> <silent> <F4> <F7><ESC>:AirlineRefresh<CR>
+:silent! vmap <unique> <silent> <F4> <F7>:<C-u>AirlineRefresh<CR>gv
 if &t_Co > 2 || has("gui_running")
 	syntax enable
 	set hlsearch
