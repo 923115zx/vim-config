@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-09-19 11:15:43
+"      LastModified                : 2017-09-20 20:45:40
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -67,7 +67,7 @@ set fencs=utf-8,GB18030,ucs-bom,default,latin1
 filetype plugin indent on
 " Vim7.4 has no noinsert and noselect option for cot.
 "set completeopt=menu,menuone,noinsert,preview
-set completeopt=menu,menuone,preview
+set completeopt=menu,longest,preview
 set wildmode=list:longest,full		" Command line completion list.
 set tabstop=4
 set shiftwidth=4
@@ -1166,7 +1166,8 @@ func! s:MoveToMiddle()
 endfunc
 
 " (9) Popup menu mappings.
-:silent! inoremap <unique> <expr> <ESC> pumvisible() ? "\<C-E>" : "\<ESC>"
+":silent! inoremap <unique> <expr> <ESC> pumvisible() ? "\<C-E>" : "\<ESC>"
+:silent! inoremap <unique> <expr> <ESC> pumvisible() ? "\<C-E>\<ESC>a" : "\<ESC>"
 :silent! inoremap <unique> <expr> <CR>  pumvisible() ? "\<C-Y>\<ESC>a" : "\<CR>"
 :silent! inoremap <unique> <expr> <C-j> pumvisible() ? "\<C-N>" : "\<Down>"
 :silent! inoremap <unique> <expr> <C-k> pumvisible() ? "\<C-P>" : "\<Up>"
@@ -1550,6 +1551,7 @@ let g:ycm_warning_symbol = '->'
 let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
 let g:ycm_always_populate_location_list = 1
 let g:ycm_echo_current_diagnostic = 1
+"let g:ycm_python_binary_path = '/usr/local/bin'
 :silent! nnoremap <unique> <silent> <Leader>t :YcmCompleter GoToDefinitionElseDeclaration<CR>
 ":silent! nnoremap <unique> <silent> <Leader>f :YcmCompleter GoToInclude<CR>
 ":silent! nnoremap <unique> <silent> <Leader>g :YcmCompleter GoToDefinition<CR>
@@ -1568,7 +1570,7 @@ color modified_solarized
 " [----End Powerline----] }}}
 
 " (5) Airline
-let g:airline_powerline_fonts=1
+let g:airline_powerline_fonts = 1
 let g:airline#extensions#whitespace#enabled = 0
 let g:airline_section_y = '%{strftime("%x %R %a")}'
 let g:airline_section_x = ''
