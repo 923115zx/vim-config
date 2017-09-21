@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-09-20 22:17:47
+"      LastModified                : 2017-09-21 10:06:23
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -25,14 +25,9 @@ set cursorcolumn
 " Colorscheme solarized global variables.
 let g:solarized_termcolors=&t_Co
 let g:solarized_contrast="high"
-let g:bgToggleKey = "<F6>"
-let g:contraToggleKey = "<F7>"
-:silent! nmap <silent> <unique> <F3> <F6>:AirlineRefresh<CR>
-:silent! imap <unique> <silent> <F3> <F6><ESC>:AirlineRefresh<CR>
-:silent! vmap <unique> <silent> <F3> <F6>:<C-u>AirlineRefresh<CR>gv
-:silent! nmap <silent> <unique> <F4> <F7>:AirlineRefresh<CR>
-:silent! imap <unique> <silent> <F4> <F7><ESC>:AirlineRefresh<CR>
-:silent! vmap <unique> <silent> <F4> <F7>:<C-u>AirlineRefresh<CR>gv
+let g:bgTogKey = "<F3>"
+let g:contraTogKey = "<F4>"
+let g:bg_or_contra_toggle_callback_cmd = "AirlineRefresh"
 if &t_Co > 2 || has("gui_running")
 	syntax enable
 	set hlsearch
@@ -1174,8 +1169,7 @@ func! s:MoveToMiddle()
 endfunc
 
 " (9) Popup menu mappings.
-":silent! inoremap <unique> <expr> <ESC> pumvisible() ? "\<C-E>" : "\<ESC>"
-:silent! inoremap <unique> <expr> <ESC> pumvisible() ? "\<C-E>\<ESC>a" : "\<ESC>"
+:silent! inoremap <unique> <expr> <ESC> pumvisible() ? "\<C-E>" : "\<ESC>"
 :silent! inoremap <unique> <expr> <CR>  pumvisible() ? "\<C-Y>\<ESC>a" : "\<CR>"
 :silent! inoremap <unique> <expr> <C-j> pumvisible() ? "\<C-N>" : "\<Down>"
 :silent! inoremap <unique> <expr> <C-k> pumvisible() ? "\<C-P>" : "\<Up>"
@@ -1559,7 +1553,6 @@ let g:ycm_warning_symbol = '->'
 let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
 let g:ycm_always_populate_location_list = 1
 let g:ycm_echo_current_diagnostic = 1
-"let g:ycm_python_binary_path = '/usr/local/bin'
 :silent! nnoremap <unique> <silent> <Leader>t :YcmCompleter GoToDefinitionElseDeclaration<CR>
 ":silent! nnoremap <unique> <silent> <Leader>f :YcmCompleter GoToInclude<CR>
 ":silent! nnoremap <unique> <silent> <Leader>g :YcmCompleter GoToDefinition<CR>

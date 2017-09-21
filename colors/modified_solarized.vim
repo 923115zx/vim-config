@@ -1033,19 +1033,30 @@ func! s:ChangeContrast()
 	exe "call s:Modified_solarized()"
 endfunc
 
-func! s:SetTogmap(mapActivation)
-	exe "silent! nnoremap <unique> ".a:mapActivation." :call <SID>TogBg()<CR>"
-	exe "silent! inoremap <unique> ".a:mapActivation." <C-R>=<SID>TogBg()<CR>"
-	exe "silent! vnoremap <unique> ".a:mapActivation." :<C-U>call <SID>TogBg()<CR>gv"
+func! s:SetTogmap()
+	let callback = g:bg_or_contra_toggle_callback_cmd == "" ? "" :
+				\ ":".g:bg_or_contra_toggle_callback_cmd."<CR>"
+	exe "silent! nnoremap <unique> <silent> ".g:bgTogKey." :call <SID>TogBg()<CR>"
+				\.callback
+	exe "silent! inoremap <unique> <silent> ".g:bgTogKey." <ESC>:call <SID>TogBg()<ESC>"
+				\.callback."a"
+	exe "silent! vnoremap <unique> <silent> ".g:bgTogKey." <ESC>:call <SID>TogBg()<ESC>"
+				\ .callback."gv"
 endfunc
-func! s:SetContrastmap(mapActivation)
-	exe "silent! nnoremap <unique> ".a:mapActivation." :call <SID>ChangeContrast()<CR>"
-	exe "silent! inoremap <unique> ".a:mapActivation." <C-R>=<SID>ChangeContrast()<CR>"
-	exe "silent! vnoremap <unique> ".a:mapActivation." :<C-U>call <SID>ChangeContrast()<CR>gv"
+func! s:SetContrastmap()
+	let callback = g:bg_or_contra_toggle_callback_cmd == "" ? "" :
+				\ ":".g:bg_or_contra_toggle_callback_cmd."<CR>"
+	exe "silent! nnoremap <unique> <silent> ".g:contraTogKey
+				\." :call <SID>ChangeContrast()<CR>".callback
+	exe "silent! inoremap <unique> <silent> ".g:contraTogKey.
+				\" <ESC>:call <SID>ChangeContrast()<CR>".callback."a"
+	exe "silent! vnoremap <unique> <silent> ".g:contraTogKey.
+				\" <ESC>:call <SID>ChangeContrast()<CR>".callback."gv"
 endfunc
-let g:bgToggleKey = get(g:, 'bgToggleKey', "<F3>")
-let g:contraToggleKey = get(g:, 'contraToggleKey', "<F4>")
-call s:SetTogmap(g:bgToggleKey)
-call s:SetContrastmap(g:contraToggleKey)
+let g:bgTogKey = get(g:, "bgTogKey", "<F3>")
+let g:contraTogKey = get(g:, "contraTogKey", "<F4>")
+let g:bg_or_contra_toggle_callback_cmd = get(g:, "bg_or_contra_toggle_callback_cmd", "")
+call s:SetTogmap()
+call s:SetContrastmap()
 "}}}
 
