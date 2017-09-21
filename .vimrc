@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-09-21 16:55:14
+"      LastModified                : 2017-09-21 22:08:35
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1370,7 +1370,7 @@ endfunc
 " Get correct background color based on current background setting.
 func! GetCorrectBgs()
 	if g:solarized_background == "dark"
-		let s:ctermbg = "ctermbg=0"
+		let s:ctermbg = "ctermbg=16"
 		let s:guibg = "guibg=Black"
 	else
 		let s:ctermbg = "ctermbg=15"
