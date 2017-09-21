@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-09-21 11:34:59
+"      LastModified                : 2017-09-21 16:55:14
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1169,6 +1169,7 @@ func! s:MoveToMiddle()
 endfunc
 
 " (9) Popup menu mappings.
+" On mac os, just input <C-e> is not work when ycm loaded, So change it to <C-e><ESC>a.
 :silent! inoremap <unique> <expr> <ESC> pumvisible() ? "\<C-E>\<ESC>a" : "\<ESC>"
 :silent! inoremap <unique> <expr> <CR>  pumvisible() ? "\<C-Y>\<ESC>a" : "\<CR>"
 :silent! inoremap <unique> <expr> <C-j> pumvisible() ? "\<C-N>" : "\<Down>"
@@ -1225,7 +1226,11 @@ func! GetCol()
 "	echo screen_row
 "	let scb_ = &scrollbind
 "	echo scb_
-	echo "lines=".&lines.", columns=".&columns.", winheight=".winheight(0).", winwidth=".winwidth(0)
+"	echo "lines=".&lines.", columns=".&columns.", winheight=".winheight(0).", winwidth=".winwidth(0)
+"	for id in synstack(line('.'), col('.')+1)
+"		echo synIDattr(id, "name")
+"	endfor
+	echo synIDattr(synID(line('.'), col('.'), 0), "name")
 
 	"echo l:cur_col
 	"echo l:cur_col_char
@@ -1339,6 +1344,39 @@ endfunc
 
 :silent! vnoremap v <C-v>
 :silent! vnoremap <C-v> v
+
+" (23) Cursorline and CursorColumn auto reset.
+let s:cursorlinehl = ""
+let s:ctermbg = ""
+let s:guibg = ""
+
+augroup vim_config
+	autocmd WinEnter * set cursorline | set cursorcolumn
+	autocmd WinLeave * set nocursorline | set nocursorcolumn
+	autocmd InsertEnter * call GetCursorLineHl() | call GetCorrectBgs() |
+				\ exe "hi CursorLine " . s:ctermbg " " . s:guibg
+	autocmd InsertLeave * exe "hi " . s:cursorlinehl
+augroup end
+
+" Get normal mode cursorline highlight setting.
+func! GetCursorLineHl()
+	redir! => s:cursorlinehl
+	silent hi CursorLine
+	redir END
+	let s:cursorlinehl = matchstr(s:cursorlinehl, '^.\{-}\zs\k.*')
+	let s:cursorlinehl = substitute(s:cursorlinehl, '\s*xxx', '', '')
+endfunc
+
+" Get correct background color based on current background setting.
+func! GetCorrectBgs()
+	if g:solarized_background == "dark"
+		let s:ctermbg = "ctermbg=0"
+		let s:guibg = "guibg=Black"
+	else
+		let s:ctermbg = "ctermbg=15"
+		let s:guibg = "guibg=White"
+	endif
+endfunc
 
 " +----------------------------------------------------------------------+
 " |                        PIECEMEAL FEATURE END                         |
