@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-09-21 22:08:35
+"      LastModified                : 2017-09-29 10:11:10
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1105,6 +1105,10 @@ func! MoveSwing(button)
 	" -1 because line_len is length, start_col is col index.
 	let contentlen = line_len - start_col - 1
 	let move_dist = float2nr(contentlen / moveDenominator)
+	" At least move 5 bytes a time.
+	if move_dist < 5
+		let move_dist = 5
+	endif
 
 	if toLeft == 1
 		if pos[2]-move_dist < start_col || move_dist == 0
