@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-09-29 10:11:10
+"      LastModified                : 2017-09-30 18:05:45
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1013,7 +1013,110 @@ endfunc
 " some small differences. When using <expr> to decorate map and rhs is
 " function, then this function is not allowed to change buffer text.
 ":silent! inoremap <unique> <silent> <expr> <TAB> <SID>MyComplete()
-:silent! inoremap <unique> <silent> <TAB> <C-R>=MyComplete()<CR>
+":silent! inoremap <unique> <silent> <TAB> <C-R>=MyComplete()<CR>
+
+" New version complete.
+let s:completionSet = []
+func! AddCom(left, right, completion, ...)
+	" The argument a:xxx is const. So we need fetch entries and form another
+	" dir, to make sure all opts are present, but we entered don't need to.
+	let opts = empty(a:000) ? {} : a:000[0]
+
+	let restoreCursor = get(opts, 'restore', 0)
+	let filetype      = get(opts, 'filetype', '')
+
+	call insert(s:completionSet, [a:left, a:right, a:completion,
+					\{
+						\ 'restore'  : restoreCursor,
+						\ 'filetype' : filetype,
+					\}
+				\])
+endfunc
+
+let s:ANYTHING = '.*'
+let s:NOTHING  = ''
+let s:EOL = '\s*$'
+
+call AddCom('{', '}', "\<CR>\<ESC>O", {'filetype':'cpp'})
+call AddCom('{', s:EOL, '}', {'restore':1})
+call AddCom('\[', s:NOTHING, "]", {'restore':1})
+call AddCom('(', s:NOTHING, ")", {'restore':1})
+call AddCom('<', s:NOTHING, '>', {'restore':1})
+call AddCom("'", s:NOTHING, "'", {'restore':1})
+call AddCom('"', s:NOTHING, '"', {'restore':1})
+call AddCom('\p', "}", "\<RIGHT>")
+call AddCom('\p', "]", "\<RIGHT>")
+call AddCom('\p', ")", "\<RIGHT>")
+call AddCom('\p', ">", "\<RIGHT>")
+call AddCom('\p', "'", "\<RIGHT>")
+call AddCom('\p', '"', "\<RIGHT>")
+
+func! Complete()
+	let pum_access = ""
+	if pumvisible()
+		if !exists("g:loaded_youcompleteme")
+			return "\<C-Y>\<TAB>"
+		endif
+		let pum_access = "\<C-Y>\<ESC>a"
+	endif
+	if BuildChunkFrame()
+		return ""
+	endif
+
+	let cur_pos   = getpos('.')
+	let cur_col   = cur_pos[2]
+	let cur_line  = cur_pos[1]
+	let line_text = getline('.')
+
+	let cursor_back = "\<C-O>:call setpos('.'," . string(cur_pos) . ")\<CR>"
+
+	" %Nc is only works in match().
+	let pos_pattern = '\zs\%' . cur_col . 'c\ze'
+
+	for [left, right, action, opts] in s:completionSet
+		if !SupportedFiletype(opts['filetype'])
+			continue
+		endif
+		let comparePattern = left . pos_pattern . right
+		if match(line_text, comparePattern) != -1
+			" Code around bug in setpos() when used at EOL...
+			if cur_col == strlen(line_text)+1 && strlen(action)==1
+				let cursor_back = "\<LEFT>"
+			endif
+			return pum_access . action . (opts['restore'] ? cursor_back : "")
+		endif
+	endfor
+	if line_text[cur_col-2] =~ '\k' && !exists("g:loaded_youcompleteme")
+		return pum_access . "\<C-N>"
+	else
+		return pum_access . "\<TAB>"
+	endif
+endfunc
+
+func! SupportedFiletype(supportTypes)
+	if a:supportTypes == ''
+		return 1
+	endif
+	let start = 0
+	let occur = -1
+	while 1
+		let start = occur + 1
+		let occur = stridx(a:supportTypes, ',', start)
+		if occur == -1
+			let nextType = strpart(a:supportTypes, start, strlen(a:supportTypes)-start)
+		else
+			let nextType = strpart(a:supportTypes, start, occur-start+1)
+		endif
+		if nextType == &filetype
+			return 1
+		endif
+		if occur == -1
+			return 0
+		endif
+	endwhile
+endfunc
+
+:silent! inoremap <unique> <silent> <TAB> <C-R>=Complete()<CR>
 
 " +----------------------------------------------------------------------+
 " |                    SEMI-AUTOMATIC COMPLETION END                     |
