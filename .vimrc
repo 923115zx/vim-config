@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-09-30 18:05:45
+"      LastModified                : 2017-10-03 00:53:38
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -839,105 +839,13 @@ endfunc
 " +----------------------------------------------------------------------+
 " |                     9. SEMI-AUTOMATIC COMPLETION                     |
 " +----------------------------------------------------------------------+
-let s:completions = []
-func! s:AddCompletion(left, right, completion, restore)
-	call add(s:completions, [a:left, a:right, a:completion, a:restore])
-endfunc
-
-let s:NONE = ""
-"						left	right		completion		restore
-"						====	======		=============	=======
-call <SID>AddCompletion('{', 	'}',		"\<CR>\<ESC>O", 	0)
-call <SID>AddCompletion('{', 	s:NONE,			'}', 			1)
-call <SID>AddCompletion('\[', 	s:NONE,			"]", 			1)
-call <SID>AddCompletion('(',	s:NONE,			")",			1)
-call <SID>AddCompletion('<',	s:NONE,			'>',			1)
-call <SID>AddCompletion("'",	s:NONE,			"'",			1)
-call <SID>AddCompletion('"',	s:NONE,			'"',			1)
-call <SID>AddCompletion('\p', 	"}",		"\<RIGHT>",			0)
-call <SID>AddCompletion('\p', 	"]",		"\<RIGHT>",			0)
-call <SID>AddCompletion('\p', 	')',		"\<RIGHT>",			0)
-call <SID>AddCompletion('\p',	'>',		"\<RIGHT>",			0)
-call <SID>AddCompletion('\p',	"'",		"\<RIGHT>",			0)
-call <SID>AddCompletion('\p',	'"',		"\<RIGHT>",			0)
-
-" I copyed SmartComplete from Damian Conway's article, but it has a bug...,
-" I tried to fix it, failed. Than I change the content and write my own
-" complete function, replace '%Nc' to compare the two characters in left
-" slot and right slot next to current column.
-func! MyComplete()
-	" Popup menu is already opened, return CRTL-Y to choose the current highlight
-	" option.
-	let pum_access = ""
-	if pumvisible()
-		"return "\<C-N>"
-		if !exists("g:loaded_youcompleteme")
-			return "\<C-Y>\<TAB>"		" Ycm provides semantic complete, no need return CRTL-N here.
-		endif
-"		return "\<C-Y>\<ESC>a" 	 " Choose current highlighted option, and quit pupup menu.
-		let pum_access = "\<C-Y>\<ESC>a"
-	endif
-	if BuildChunkFrame()
-		return ""
-	endif
-
-	let cur_pos = getpos('.')
-	let cur_col = cur_pos[2]
-	let cur_line = cur_pos[1]
-	let line_text = getline('.')
-
-	" Before and after current col text in current line.
-	"let lhs = strpart(line_text, 0, cur_col-1)
-	"let rhs = strpart(line_text, cur_col-1)
-
-	" %Nc is using for pattern match current column. Only works here.
-	let position_pattern = '\%' . cur_col . 'c'
-	" Detect if left side of current column are only spaces, return \t when yes.
-	if line_text =~ '^\s*' . position_pattern
-		return pum_access . "\<TAB>"
-	endif
-
-	" Very close to current column chars, left and right.
-	let lhsc = line_text[cur_col-2]
-	let rhsc = line_text[cur_col-1]
-	" Pattern using for coming back to original position.
-	let cursor_back = "\<C-O>:call setpos('.'," . string(cur_pos) . ")\<CR>"
-
-	" Find matching cases in completions.
-	for [lchar, rchar, replacement, ifback] in s:completions
-		if lhsc=~lchar && rhsc==rchar
-			" Code around bug in setpos() when used at EOL...
-			if cur_col == strlen(line_text)+1 && strlen(replacement)==1
-				let cursor_back = "\<LEFT>"
-			endif
-			" Check if class or struct definition, need to add ';' after '}' if yes.
-			let chunkType = GetChunkType(cur_line)
-			if lhsc=='{' && rhsc==s:NONE && chunkType!=""
-				if chunkType == 'namespace'
-				" Only c/c++ has namespace. so just use c style brick comment.
-					let extra_comment = " \/\* namespace " . GetChunkName(cur_line) . " \*\/"
-					return pum_access . replacement . extra_comment . (ifback ? cursor_back
-								\. repeat("\<LEFT>", strlen(extra_comment)) : "")
-				endif
-				return pum_access . replacement . ';' . (ifback ? cursor_back . "\<LEFT>" : "")
-			endif
-			" Return self-define actions.
-			return pum_access . replacement . (ifback ? cursor_back : "")
-		endif
-	endfor
-	if lhsc =~ '\k' && !exists("g:loaded_youcompleteme")
-		return pum_access . "\<C-N>"			" No ycm and lhs is alphanumeric, return CRTL-N
-	else
-		" If has ycm or other condition, still <TAB>
-		return pum_access . "\<TAB>"
-	endif
-endfunc
 
 let s:chunk_pattern_pairs = {
 				\ 'namespace' 	: '^\s*namespace\s*',
 				\ 'struct' 		: '^\s*struct\s*',
 				\ 'class' 		: '^\s*class\s*',
 				\ 'enum' 		: '^\s*enum\s*',
+				\ 'union' 		: '^\s*union\s*',
 			\}
 
 " Parse current line and previous line to get this chunk's type.
@@ -1009,12 +917,6 @@ func! GetChunkName(lnr)
 	return ''
 endfunc
 
-" <C-R> and <expr> both can call function in insert mode, but they have
-" some small differences. When using <expr> to decorate map and rhs is
-" function, then this function is not allowed to change buffer text.
-":silent! inoremap <unique> <silent> <expr> <TAB> <SID>MyComplete()
-":silent! inoremap <unique> <silent> <TAB> <C-R>=MyComplete()<CR>
-
 " New version complete.
 let s:completionSet = []
 func! AddCom(left, right, completion, ...)
@@ -1033,24 +935,67 @@ func! AddCom(left, right, completion, ...)
 				\])
 endfunc
 
+func! Repeat(...)
+	let combinedstr = ""
+	let limit = a:0%2 == 0 ? a:0 : a:0-1
+	for i in range(0, limit-1, 2)
+		let combinedstr .= repeat(a:000[i], a:000[i+1])
+	endfor
+	return combinedstr
+endfunc
+
+func! FillUp()
+	let found = search("___", "Wc", line(".")+2)
+	if found == 0
+		return ''
+	endif
+	return Repeat("\<Del>", 3)
+endfunc
+
+:silent! inoremap <unique> <silent> <C-C> <C-R>=FillUp()<CR>
+
 let s:ANYTHING = '.*'
-let s:NOTHING  = ''
+let s:NOTHING  = '\s\='
 let s:EOL = '\s*$'
 
-call AddCom('{', '}', "\<CR>\<ESC>O", {'filetype':'cpp'})
-call AddCom('{', s:EOL, '}', {'restore':1})
-call AddCom('\[', s:NOTHING, "]", {'restore':1})
-call AddCom('(', s:NOTHING, ")", {'restore':1})
-call AddCom('<', s:NOTHING, '>', {'restore':1})
-call AddCom("'", s:NOTHING, "'", {'restore':1})
-call AddCom('"', s:NOTHING, '"', {'restore':1})
-call AddCom('\p', "}", "\<RIGHT>")
-call AddCom('\p', "]", "\<RIGHT>")
-call AddCom('\p', ")", "\<RIGHT>")
-call AddCom('\p', ">", "\<RIGHT>")
-call AddCom('\p', "'", "\<RIGHT>")
-call AddCom('\p', '"', "\<RIGHT>")
+"          =left=   =right=    =completion=            =opts=
+call AddCom('{',   s:EOL,          '}',            {'restore':1}       )
+call AddCom('\[', s:NOTHING,       "]",            {'restore':1}       )
+call AddCom('(',  s:NOTHING,       ")",            {'restore':1}       )
+call AddCom('<',  s:NOTHING,       '>',            {'restore':1}       )
+call AddCom("'",  s:NOTHING,       "'",            {'restore':1}       )
+call AddCom('"',  s:NOTHING,       '"',            {'restore':1}       )
+call AddCom('\p',    "}",      "\<RIGHT>"                              )
+call AddCom('{',     '}',     "\<CR>\<ESC>O", {'filetype':'cpp,c,java'})
+call AddCom('\p',    "]",      "\<RIGHT>"                              )
+call AddCom('\p',    ")",      "\<RIGHT>"                              )
+call AddCom('\p',    ">",      "\<RIGHT>"                              )
+call AddCom('\p',    "'",      "\<RIGHT>"                              )
+call AddCom('\p',    '"',      "\<RIGHT>"                              )
 
+" VIM sematic complete.
+call AddCom( '^\s*func\%[tion]',  s:EOL,  "\<C-W>func! \n___\nendfunc\<UP>\<UP>",                     {'filetype' : 'vim'} )
+call AddCom( '^\s*if',            s:EOL,  " \n___\nendif\<UP>\<UP>",                                  {'filetype' : 'vim'} )
+call AddCom( '^\s*for',           s:EOL,  "  in ___\n___\nendfor" . Repeat("\<UP>", 2, "\<LEFT>", 2), {'filetype' : 'vim'} )
+call AddCom( '^\s*while',         s:EOL,  " \n___\nendwhile\<UP>\<UP>",                               {'filetype' : 'vim'} )
+
+" CPP sematic complete.
+call AddCom( '^\s*\(if\)\|\(else if\)',
+			\ s:EOL,
+			\ " ()\n{\n___\n}" . Repeat("\<UP>" , 3 , "\<RIGHT>" , 9, "\<LEFT>", 1),
+			\ {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*else',   s:EOL,  "\n{\n-\n}\<UP>\<RIGHT>\<DEL>",                                    {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*for',    s:EOL,  " (; ___; ___)\n{\n___\n}" . Repeat("\<UP>" , 3 , "\<RIGHT>" , 4), {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*while',  s:EOL,  " ()\n{\n___\n}" . Repeat("\<UP>", 3, "\<RIGHT>", 6),              {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*do',     s:EOL,  "\n{\n-\n} while (___);\<UP>\<BS>",                                {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*switch',
+			\ s:EOL,
+			\ " ()\n{\n".Repeat("case ___:\n___\n\<C-D>\<C-D>break;\n", 3)."default:\n___\n\<C-D>\<C-D>break;\n}".Repeat("\<UP>", 14, "\<RIGHT>", 7),
+			\ {'filetype' : 'c,cpp,java'} )
+
+" Fixed version. Add filetype support, and open the interface for future
+" improve. Use %Nc to instead original left side char and right side char
+" compare.
 func! Complete()
 	let pum_access = ""
 	if pumvisible()
@@ -1059,6 +1004,8 @@ func! Complete()
 		endif
 		let pum_access = "\<C-Y>\<ESC>a"
 	endif
+
+	" Write constructors for a new class.
 	if BuildChunkFrame()
 		return ""
 	endif
@@ -1070,7 +1017,7 @@ func! Complete()
 
 	let cursor_back = "\<C-O>:call setpos('.'," . string(cur_pos) . ")\<CR>"
 
-	" %Nc is only works in match().
+	" %Nc is only works in match(), not in =~.
 	let pos_pattern = '\zs\%' . cur_col . 'c\ze'
 
 	for [left, right, action, opts] in s:completionSet
@@ -1083,7 +1030,10 @@ func! Complete()
 			if cur_col == strlen(line_text)+1 && strlen(action)==1
 				let cursor_back = "\<LEFT>"
 			endif
-			return pum_access . action . (opts['restore'] ? cursor_back : "")
+			let addition = GetCChunkComAddition(left, right)
+			let addtionAction = get(addition, 'profix', '')
+			let addtionMove = get(addition, 'move', '')
+			return pum_access . action . addtionAction . (opts['restore'] ? cursor_back . addtionMove : "")
 		endif
 	endfor
 	if line_text[cur_col-2] =~ '\k' && !exists("g:loaded_youcompleteme")
@@ -1093,19 +1043,37 @@ func! Complete()
 	endif
 endfunc
 
+func! GetCChunkComAddition(left, right)
+	let addition = {}
+	if &filetype != 'c' && &filetype != 'cpp'
+		return addition
+	endif
+	let chunktype = GetChunkType(line('.'))
+	if a:left=='{' && a:right==s:EOL && chunktype!=""
+		let extra_comment = ";"
+		if chunktype == 'namespace'
+			let extra_comment .= " \/\* namespace " . GetChunkName(line('.')) . " \*\/"
+		endif
+		let addition['profix'] = extra_comment
+		let addition['move'] = repeat("\<LEFT>", strlen(extra_comment))
+	endif
+	return addition
+endfunc
+
 func! SupportedFiletype(supportTypes)
 	if a:supportTypes == ''
 		return 1
 	endif
 	let start = 0
 	let occur = -1
+
 	while 1
 		let start = occur + 1
 		let occur = stridx(a:supportTypes, ',', start)
 		if occur == -1
 			let nextType = strpart(a:supportTypes, start, strlen(a:supportTypes)-start)
 		else
-			let nextType = strpart(a:supportTypes, start, occur-start+1)
+			let nextType = strpart(a:supportTypes, start, occur-start)
 		endif
 		if nextType == &filetype
 			return 1
@@ -1337,7 +1305,12 @@ func! GetCol()
 "	for id in synstack(line('.'), col('.')+1)
 "		echo synIDattr(id, "name")
 "	endfor
-	echo synIDattr(synID(line('.'), col('.'), 0), "name")
+"	echo synIDattr(synID(line('.'), col('.'), 0), "name")
+	let res = ""
+	for i in range(0, -1, 2)
+		let res .= i
+	endfor
+	echo res
 
 	"echo l:cur_col
 	"echo l:cur_col_char
