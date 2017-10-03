@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-10-03 00:53:38
+"      LastModified                : 2017-10-03 22:54:41
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -918,6 +918,7 @@ func! GetChunkName(lnr)
 endfunc
 
 " New version complete.
+
 let s:completionSet = []
 func! AddCom(left, right, completion, ...)
 	" The argument a:xxx is const. So we need fetch entries and form another
@@ -935,6 +936,9 @@ func! AddCom(left, right, completion, ...)
 				\])
 endfunc
 
+" Accept odd number arguments, they must be pairs of a repeatable str and a
+" repeat time. Do repeat the str with its repeat times seperately, and then
+" join the results to one and return.
 func! Repeat(...)
 	let combinedstr = ""
 	let limit = a:0%2 == 0 ? a:0 : a:0-1
@@ -944,6 +948,7 @@ func! Repeat(...)
 	return combinedstr
 endfunc
 
+" Find next '___' in +2 lines, and erase it to input.
 func! FillUp()
 	let found = search("___", "Wc", line(".")+2)
 	if found == 0
@@ -956,22 +961,22 @@ endfunc
 
 let s:ANYTHING = '.*'
 let s:NOTHING  = '\s\='
-let s:EOL = '\s*$'
+let s:EOL      = '\s*$'
 
 "          =left=   =right=    =completion=            =opts=
-call AddCom('{',   s:EOL,          '}',            {'restore':1}       )
-call AddCom('\[', s:NOTHING,       "]",            {'restore':1}       )
-call AddCom('(',  s:NOTHING,       ")",            {'restore':1}       )
-call AddCom('<',  s:NOTHING,       '>',            {'restore':1}       )
-call AddCom("'",  s:NOTHING,       "'",            {'restore':1}       )
-call AddCom('"',  s:NOTHING,       '"',            {'restore':1}       )
-call AddCom('\p',    "}",      "\<RIGHT>"                              )
-call AddCom('{',     '}',     "\<CR>\<ESC>O", {'filetype':'cpp,c,java'})
-call AddCom('\p',    "]",      "\<RIGHT>"                              )
-call AddCom('\p',    ")",      "\<RIGHT>"                              )
-call AddCom('\p',    ">",      "\<RIGHT>"                              )
-call AddCom('\p',    "'",      "\<RIGHT>"                              )
-call AddCom('\p',    '"',      "\<RIGHT>"                              )
+call AddCom('{',   s:EOL,          '}',            {'restore':1}           )
+call AddCom('\[', s:NOTHING,       "]",            {'restore':1}           )
+call AddCom('(',  s:NOTHING,       ")",            {'restore':1}           )
+call AddCom('<',  s:NOTHING,       '>',            {'restore':1}           )
+call AddCom("'",  s:NOTHING,       "'",            {'restore':1}           )
+call AddCom('"',  s:NOTHING,       '"',            {'restore':1}           )
+call AddCom('\p',    "}",      "\<RIGHT>"                                  )
+call AddCom('{',     '}',     "\<CR>\<ESC>O", {'filetype':'cpp,c,java,sh'} )
+call AddCom('\p',    "]",      "\<RIGHT>"                                  )
+call AddCom('\p',    ")",      "\<RIGHT>"                                  )
+call AddCom('\p',    ">",      "\<RIGHT>"                                  )
+call AddCom('\p',    "'",      "\<RIGHT>"                                  )
+call AddCom('\p',    '"',      "\<RIGHT>"                                  )
 
 " VIM sematic complete.
 call AddCom( '^\s*func\%[tion]',  s:EOL,  "\<C-W>func! \n___\nendfunc\<UP>\<UP>",                     {'filetype' : 'vim'} )
@@ -992,6 +997,17 @@ call AddCom( '^\s*switch',
 			\ s:EOL,
 			\ " ()\n{\n".Repeat("case ___:\n___\n\<C-D>\<C-D>break;\n", 3)."default:\n___\n\<C-D>\<C-D>break;\n}".Repeat("\<UP>", 14, "\<RIGHT>", 7),
 			\ {'filetype' : 'c,cpp,java'} )
+
+" Shell sematic complete.
+call AddCom( '^\s*if',    s:EOL, " [  ]; then\n___\n\<C-D>fi" . Repeat("\<UP>", 2, "\<RIGHT>", 3),         {'filetype' : 'sh'} )
+call AddCom( '^\s*elif',  s:EOL, " [  ]; then\n___\<UP>",                                                  {'filetype' : 'sh'} )
+call AddCom( '^\s*else',  s:EOL, "\n",                                                                     {'filetype' : 'sh'} )
+call AddCom( '^\s*for',   s:EOL, "  in ___\n\<C-D>do\n___\n\<C-D>\<C-D>done" . Repeat("\<UP>", 3),         {'filetype' : 'sh'} )
+call AddCom( '^\s*while', s:EOL, " \n\<C-D>do\n___\n\<C-D>\<C-D>done" . Repeat("\<UP>", 3, "\<RIGHT>", 2), {'filetype' : 'sh'} )
+call AddCom( '^\s*case',
+			\ s:EOL,
+			\ "  in\n___)\n___;;\n" . Repeat("\<C-D>___)\n___;;\n", 2) . "\<C-D>\*)\n___;;\n\<C-D>\<C-D>esac" . Repeat("\<UP>", 9, "\<RIGHT>", 1),
+			\ {'filetype' : 'sh'} )
 
 " Fixed version. Add filetype support, and open the interface for future
 " improve. Use %Nc to instead original left side char and right side char
@@ -1030,10 +1046,12 @@ func! Complete()
 			if cur_col == strlen(line_text)+1 && strlen(action)==1
 				let cursor_back = "\<LEFT>"
 			endif
+			" Plan to fetch the chunk complete out to an extra action set in future.
 			let addition = GetCChunkComAddition(left, right)
 			let addtionAction = get(addition, 'profix', '')
 			let addtionMove = get(addition, 'move', '')
-			return pum_access . action . addtionAction . (opts['restore'] ? cursor_back . addtionMove : "")
+			return pum_access . action . addtionAction .
+						\(opts['restore'] ? cursor_back . addtionMove : "")
 		endif
 	endfor
 	if line_text[cur_col-2] =~ '\k' && !exists("g:loaded_youcompleteme")
@@ -1043,6 +1061,7 @@ func! Complete()
 	endif
 endfunc
 
+" Get extra content need to write for chunks after '}' in c and cpp files.
 func! GetCChunkComAddition(left, right)
 	let addition = {}
 	if &filetype != 'c' && &filetype != 'cpp'
@@ -1060,6 +1079,7 @@ func! GetCChunkComAddition(left, right)
 	return addition
 endfunc
 
+" Check if current file is supported by current completion's opt descripting.
 func! SupportedFiletype(supportTypes)
 	if a:supportTypes == ''
 		return 1
