@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-10-03 22:54:41
+"      LastModified                : 2017-10-07 22:14:46
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -70,7 +70,7 @@ set fencs=utf-8,GB18030,ucs-bom,default,latin1
 filetype plugin indent on
 " Vim7.4 has no noinsert and noselect option for cot.
 "set completeopt=menu,menuone,noinsert,preview
-set completeopt=menu,longest,preview
+set completeopt=menu,longest
 set wildmode=list:longest,full		" Command line completion list.
 set tabstop=4
 set shiftwidth=4
@@ -985,7 +985,7 @@ call AddCom( '^\s*for',           s:EOL,  "  in ___\n___\nendfor" . Repeat("\<UP
 call AddCom( '^\s*while',         s:EOL,  " \n___\nendwhile\<UP>\<UP>",                               {'filetype' : 'vim'} )
 
 " CPP sematic complete.
-call AddCom( '^\s*\(if\)\|\(else if\)',
+call AddCom( '^\s*\(if\|else if\)',
 			\ s:EOL,
 			\ " ()\n{\n___\n}" . Repeat("\<UP>" , 3 , "\<RIGHT>" , 9, "\<LEFT>", 1),
 			\ {'filetype' : 'c,cpp,java'} )
