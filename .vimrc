@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-10-09 10:29:24
+"      LastModified                : 2017-10-09 10:32:17
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1215,7 +1215,7 @@ func! MoveSwing(button)
 endfunc
 
 " (5) Trun off current searching word's  highlight. But not turn off hlsearch.
-:silent! nnoremap <unique> <silent> <Leader>; :set noh<CR>
+:silent! nnoremap <unique> <silent> <Leader>; :noh<CR>
 ":silent! nnoremap <unique> <silent> <Leader>; :g/<C-R>=<SID>UnableToFind()<CR><CR>:echo <CR>
 "func! s:UnableToFind()
 "	let wontbefound = repeat('vimrc', 4)
