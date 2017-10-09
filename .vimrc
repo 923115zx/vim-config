@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-10-07 22:14:46
+"      LastModified                : 2017-10-09 10:29:24
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -957,7 +957,7 @@ func! FillUp()
 	return Repeat("\<Del>", 3)
 endfunc
 
-:silent! inoremap <unique> <silent> <C-C> <C-R>=FillUp()<CR>
+:silent! inoremap <unique> <silent> <C-G> <C-R>=FillUp()<CR>
 
 let s:ANYTHING = '.*'
 let s:NOTHING  = '\s\='
@@ -1160,7 +1160,7 @@ exe ":silent! nnoremap <unique> B " . g:jumpRange . "<C-e>"
 let g:moveDenominator=6		" 3~10
 let g:moveLeft="_"
 let g:moveRight="+"
-let g:find_="<C-g>" 		" use :f
+let g:find_="<Leader>g"		" use :f
 exe ":silent! nnoremap <unique> " . g:find_ . " f_"
 exe ":silent! vnoremap <unique> " . g:find_ . " f_"
 exe ":silent! nnoremap <unique> <expr> <silent> ".g:moveLeft." MoveSwing(1)"
@@ -1215,11 +1215,12 @@ func! MoveSwing(button)
 endfunc
 
 " (5) Trun off current searching word's  highlight. But not turn off hlsearch.
-:silent! nnoremap <unique> <silent> <Leader>; :g/<C-R>=<SID>UnableToFind()<CR><CR>:echo <CR>
-func! s:UnableToFind()
-	let wontbefound = repeat('vimrc', 4)
-	return wontbefound
-endfunc
+:silent! nnoremap <unique> <silent> <Leader>; :set noh<CR>
+":silent! nnoremap <unique> <silent> <Leader>; :g/<C-R>=<SID>UnableToFind()<CR><CR>:echo <CR>
+"func! s:UnableToFind()
+"	let wontbefound = repeat('vimrc', 4)
+"	return wontbefound
+"endfunc
 " (6) Omaps. Following 3 omaps works for parenthese. They work when left and right
 " parenthese both in one line.
 
