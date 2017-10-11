@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-10-09 10:32:17
+"      LastModified                : 2017-10-11 21:10:06
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -340,7 +340,7 @@ endfunc
 " |                        3. C/C++ INPUT HELPER                         |
 " +----------------------------------------------------------------------+
 :silent! inoremap <unique> <C-F> __FUNCTION__
-:silent! inoremap <unique> <C-L> __LINE__
+:silent! inoremap <unique> <C-G> __LINE__
 :silent! nnoremap <unique> <silent> <Leader>n :call AddInclude(1)<CR>i
 :silent! nnoremap <unique> <silent> <Leader>y :call AddInclude(0)<CR>a
 " If pumvisible==1, <C-N> will be move selecting hi in popup menu, so we have to
@@ -957,7 +957,7 @@ func! FillUp()
 	return Repeat("\<Del>", 3)
 endfunc
 
-:silent! inoremap <unique> <silent> <C-G> <C-R>=FillUp()<CR>
+:silent! inoremap <unique> <silent> <C-L> <C-R>=FillUp()<CR>
 
 let s:ANYTHING = '.*'
 let s:NOTHING  = '\s\='
@@ -1160,7 +1160,7 @@ exe ":silent! nnoremap <unique> B " . g:jumpRange . "<C-e>"
 let g:moveDenominator=6		" 3~10
 let g:moveLeft="_"
 let g:moveRight="+"
-let g:find_="<Leader>g"		" use :f
+let g:find_="<C-g>"		" use :f
 exe ":silent! nnoremap <unique> " . g:find_ . " f_"
 exe ":silent! vnoremap <unique> " . g:find_ . " f_"
 exe ":silent! nnoremap <unique> <expr> <silent> ".g:moveLeft." MoveSwing(1)"
