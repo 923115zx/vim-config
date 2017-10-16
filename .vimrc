@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-10-11 21:10:06
+"      LastModified                : 2017-10-16 20:05:21
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1456,7 +1456,7 @@ augroup vim_config
 	autocmd WinLeave * set nocursorline | set nocursorcolumn
 	autocmd InsertEnter * call GetCursorLineHl() | call GetCorrectBgs() |
 				\ exe "hi CursorLine " . s:ctermbg " " . s:guibg
-	autocmd InsertLeave * exe "hi " . s:cursorlinehl
+	autocmd InsertLeave * :w | exe "hi " . s:cursorlinehl
 augroup end
 
 " Get normal mode cursorline highlight setting.
