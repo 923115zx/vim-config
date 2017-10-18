@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-10-16 20:05:21
+"      LastModified                : 2017-10-18 14:14:54
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -981,6 +981,7 @@ call AddCom('\p',    '"',      "\<RIGHT>"                                  )
 " VIM sematic complete.
 call AddCom( '^\s*func\%[tion]',  s:EOL,  "\<C-W>func! \n___\nendfunc\<UP>\<UP>",                     {'filetype' : 'vim'} )
 call AddCom( '^\s*if',            s:EOL,  " \n___\nendif\<UP>\<UP>",                                  {'filetype' : 'vim'} )
+call AddCom( '^\s*elseif',        s:EOL,  " \n___\<UP>",                                              {'filetype' : 'vim'} )
 call AddCom( '^\s*for',           s:EOL,  "  in ___\n___\nendfor" . Repeat("\<UP>", 2, "\<LEFT>", 2), {'filetype' : 'vim'} )
 call AddCom( '^\s*while',         s:EOL,  " \n___\nendwhile\<UP>\<UP>",                               {'filetype' : 'vim'} )
 
@@ -989,10 +990,11 @@ call AddCom( '^\s*\(if\|else if\)',
 			\ s:EOL,
 			\ " ()\n{\n___\n}" . Repeat("\<UP>" , 3 , "\<RIGHT>" , 9, "\<LEFT>", 1),
 			\ {'filetype' : 'c,cpp,java'} )
-call AddCom( '^\s*else',   s:EOL,  "\n{\n-\n}\<UP>\<RIGHT>\<DEL>",                                    {'filetype' : 'c,cpp,java'} )
-call AddCom( '^\s*for',    s:EOL,  " (; ___; ___)\n{\n___\n}" . Repeat("\<UP>" , 3 , "\<RIGHT>" , 4), {'filetype' : 'c,cpp,java'} )
-call AddCom( '^\s*while',  s:EOL,  " ()\n{\n___\n}" . Repeat("\<UP>", 3, "\<RIGHT>", 6),              {'filetype' : 'c,cpp,java'} )
-call AddCom( '^\s*do',     s:EOL,  "\n{\n-\n} while (___);\<UP>\<BS>",                                {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*else',           s:EOL,  "\n{\n-\n}\<UP>\<RIGHT>\<DEL>",                                        {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*for',            s:EOL,  " (; ___; ___)\n{\n___\n}" . Repeat("\<UP>" , 3 , "\<RIGHT>" , 4),     {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*fore\%[ach]',    s:EOL,  "\<C-W>for (; ___)\n{\n___\n}" . Repeat("\<UP>" , 3 , "\<RIGHT>" , 4), {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*while',          s:EOL,  " ()\n{\n___\n}" . Repeat("\<UP>", 3, "\<RIGHT>", 6),                  {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*do',             s:EOL,  "\n{\n-\n} while (___);\<UP>\<BS>",                                    {'filetype' : 'c,cpp,java'} )
 call AddCom( '^\s*switch',
 			\ s:EOL,
 			\ " ()\n{\n".Repeat("case ___:\n___\n\<C-D>\<C-D>break;\n", 3)."default:\n___\n\<C-D>\<C-D>break;\n}".Repeat("\<UP>", 14, "\<RIGHT>", 7),
@@ -1221,9 +1223,9 @@ endfunc
 "	let wontbefound = repeat('vimrc', 4)
 "	return wontbefound
 "endfunc
+
 " (6) Omaps. Following 3 omaps works for parenthese. They work when left and right
 " parenthese both in one line.
-
 " Works only when cursor in parenthese, effect to the content int the "()".
 :silent! onoremap <unique> p i(
 " Works when cursor is at left out of a parenthese, effect to the content in the
@@ -1272,15 +1274,47 @@ endfunc
 :silent! inoremap <unique> <expr> <C-k> pumvisible() ? "\<C-P>" : "\<Up>"
 
 " (10) Add and delete spaces.
-" Add a space to current cursor position's left and right respectively.
-:silent! nnoremap <unique> <Leader><Space> i <ESC>la <ESC>h
+" Add a space to current cursor position's left and right respectively. Recognize operator.
+:silent! nnoremap <unique> <Leader><Space> :call AddSpacesToAround()<CR>
 " Add a space to selected area's left and right respectively.
 :silent! vnoremap <unique> <Leader><Space> <ESC>:call AddParentheseForSelect(' ')<CR>
-" Delete spaces at left and right of current cursor position. If no space, ignore.
+" Delete spaces at left and right of current cursor position. If no space, ignore. Recognize operator.
 :silent! nnoremap <unique> <silent> <Leader>r :call <SID>DeleteClosedSpaces()<CR>
 func! s:DeleteClosedSpaces()
-	let line_text = getline(".")
-	let cur_col = col(".")
+	let line_text = getline('.')
+	let cur_col = col('.')
+	let assign_op = '[-+*/%|&^\.><]='
+	let comp_op = '=[=~]'
+
+	" The operators only has 2 bytes long, so just check this two substring.
+	" For example, "==" or "==". ^ indicate the cursor position.
+	"               ^        ^
+	let lpstr = strpart(line_text, cur_col-2, 2)
+	let rpstr = strpart(line_text, cur_col-1, 2)
+	if lpstr =~ assign_op || lpstr =~ comp_op
+		let leftslot  = line_text[cur_col-3]
+		let rightslot = line_text[cur_col]
+		if leftslot == ' '
+			normal hhxl
+		endif
+		if rightslot == ' '
+			normal lxh
+		endif
+		return
+	endif
+	if rpstr =~ assign_op || rpstr =~ comp_op
+		let leftslot  = line_text[cur_col-2]
+		let rightslot = line_text[cur_col+1]
+		if leftslot == ' '
+			normal hx
+		endif
+		if rightslot == ' '
+			normal llxhh
+		endif
+		return
+	endif
+
+	" If no operator match, just check the very closed two chars around current cursor.
 	let lhsc = line_text[cur_col-2]
 	let rhsc = line_text[cur_col]
 	if rhsc == ' '
@@ -1289,6 +1323,27 @@ func! s:DeleteClosedSpaces()
 	if lhsc == ' '
 		normal hx
 	endif
+endfunc
+
+" Reverse action for DeleteClosedSpaces.
+func! AddSpacesToAround()
+	let line_text = getline('.')
+	let cur_col = col('.')
+	let lpstr = strpart(line_text, cur_col-2, 2)
+	let rpstr = strpart(line_text, cur_col-1, 2)
+	let defaultResult = "normal i \<ESC>la \<ESC>h"
+
+	let assign_op = '[-+*/%|&^\.><]='
+	let comp_op = '=[=~]'
+	if lpstr =~ assign_op || lpstr =~ comp_op
+		exe "normal hi \<ESC>lla \<ESC>h"
+		return
+	endif
+	if rpstr =~ assign_op || rpstr =~ comp_op
+		exe "normal i \<ESC>lla \<ESC>hh"
+		return
+	endif
+	exe defaultResult
 endfunc
 
 " (11) Delete empty lines.
@@ -1456,7 +1511,7 @@ augroup vim_config
 	autocmd WinLeave * set nocursorline | set nocursorcolumn
 	autocmd InsertEnter * call GetCursorLineHl() | call GetCorrectBgs() |
 				\ exe "hi CursorLine " . s:ctermbg " " . s:guibg
-	autocmd InsertLeave * :w | exe "hi " . s:cursorlinehl
+	autocmd InsertLeave * exe "hi " . s:cursorlinehl
 augroup end
 
 " Get normal mode cursorline highlight setting.
