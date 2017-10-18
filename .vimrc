@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-10-18 14:14:54
+"      LastModified                : 2017-10-18 14:51:19
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -992,7 +992,7 @@ call AddCom( '^\s*\(if\|else if\)',
 			\ {'filetype' : 'c,cpp,java'} )
 call AddCom( '^\s*else',           s:EOL,  "\n{\n-\n}\<UP>\<RIGHT>\<DEL>",                                        {'filetype' : 'c,cpp,java'} )
 call AddCom( '^\s*for',            s:EOL,  " (; ___; ___)\n{\n___\n}" . Repeat("\<UP>" , 3 , "\<RIGHT>" , 4),     {'filetype' : 'c,cpp,java'} )
-call AddCom( '^\s*fore\%[ach]',    s:EOL,  "\<C-W>for (; ___)\n{\n___\n}" . Repeat("\<UP>" , 3 , "\<RIGHT>" , 4), {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*fore\%[ach]',    s:EOL,  "\<C-W>for ( : ___)\n{\n___\n}" . Repeat("\<UP>" , 3 , "\<RIGHT>" , 4), {'filetype' : 'c,cpp,java'} )
 call AddCom( '^\s*while',          s:EOL,  " ()\n{\n___\n}" . Repeat("\<UP>", 3, "\<RIGHT>", 6),                  {'filetype' : 'c,cpp,java'} )
 call AddCom( '^\s*do',             s:EOL,  "\n{\n-\n} while (___);\<UP>\<BS>",                                    {'filetype' : 'c,cpp,java'} )
 call AddCom( '^\s*switch',
@@ -1831,6 +1831,7 @@ endfunc
 " +----------------------------------------------------------------------+
 " |                         ASSIGNALIGNMENT END                          |
 " +----------------------------------------------------------------------+
+
 " TODO:
 " 1. Improve scb performence.
 " 2. Seperate .h preaccess out from CreateFile(), and add it into TitleSetter as a new autocmd.
