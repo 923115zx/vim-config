@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-10-18 14:51:19
+"      LastModified                : 2017-10-23 00:28:42
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -715,6 +715,7 @@ let s:STLContainers = [
 				\"template",
 				\"lock_guard",
 				\"unique_lock",
+				\"pair",
 			\]
 
 " Base on different input param, complete automatically.
@@ -1283,7 +1284,7 @@ endfunc
 func! s:DeleteClosedSpaces()
 	let line_text = getline('.')
 	let cur_col = col('.')
-	let assign_op = '[-+*/%|&^\.><]='
+	let assign_op = '[-+*/%|&^\.><!]='
 	let comp_op = '=[=~]'
 
 	" The operators only has 2 bytes long, so just check this two substring.
@@ -1333,7 +1334,7 @@ func! AddSpacesToAround()
 	let rpstr = strpart(line_text, cur_col-1, 2)
 	let defaultResult = "normal i \<ESC>la \<ESC>h"
 
-	let assign_op = '[-+*/%|&^\.><]='
+	let assign_op = '[-+*/%|&^\.><!]='
 	let comp_op = '=[=~]'
 	if lpstr =~ assign_op || lpstr =~ comp_op
 		exe "normal hi \<ESC>lla \<ESC>h"
