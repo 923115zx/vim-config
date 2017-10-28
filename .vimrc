@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-10-23 00:28:42
+"      LastModified                : 2017-10-28 13:34:34
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -133,13 +133,15 @@ call matchadd('InvisibleSpaces', '\s\+\%#', 100)
 let g:comment_trigger="<Leader>/"
 " Only works when one or more uncommented lines in selected lines. If all lines be
 " commented, it wouldn't uncomment them.
-let g:visual_uncomment_trigger="<Leader>r"
+let g:uncomment_trigger="<Leader>u"
 
 exe ":silent! nnoremap <unique> <silent> " . g:comment_trigger .
 			\ " :call ToggleComment()<CR>"
 exe ":silent! vnoremap <unique> <silent> " . g:comment_trigger .
 			\ " :<C-u>call <SID>ToggleComments_visual()<CR>"
-exe ":silent! vmap <unique> <silent> " . g:visual_uncomment_trigger .
+exe ":silent! nnoremap <unique> <silent> " . g:uncomment_trigger .
+			\ " :call UncommentAutoSelect()<CR>"
+exe ":silent! vmap <unique> <silent> " . g:uncomment_trigger .
 			\ " :<C-u>call UncommentLines(line(\"'<\"), line(\"'>\"))<CR>"
 :command! -range Cm <line1>,<line2>call <SID>ToggleComments_range()
 
@@ -330,6 +332,18 @@ func! UncommentLines(first_line, last_line)
 			exe lnr . 's/^\s*\zs' . s:EscapeStr(commentSymbol) . '//g'
 		endif
 	endfor
+endfunc
+
+" Using to uncomment nearby commented lines.
+func! UncommentAutoSelect()
+	let commentSymbol = s:GetCommentString()
+	let commentLinePat = '^\s*\(' . s:EscapeStr(commentSymbol) . '\)\@!'
+	let firstline = search(commentLinePat, 'bnW') + 1
+	let lastline = search(commentLinePat, 'nW') - 1
+	if lastline < 0
+		let lastline = line('$')
+	endif
+	call UncommentLines(firstline, lastline)
 endfunc
 
 " +----------------------------------------------------------------------+
