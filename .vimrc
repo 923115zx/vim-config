@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-10-28 13:34:34
+"      LastModified                : 2017-11-06 10:19:37
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -979,7 +979,7 @@ let s:NOTHING  = '\s\='
 let s:EOL      = '\s*$'
 
 "          =left=   =right=    =completion=            =opts=
-call AddCom('{',   s:EOL,          '}',            {'restore':1}           )
+call AddCom('{',  s:NOTHING,       '}',            {'restore':1}           )
 call AddCom('\[', s:NOTHING,       "]",            {'restore':1}           )
 call AddCom('(',  s:NOTHING,       ")",            {'restore':1}           )
 call AddCom('<',  s:NOTHING,       '>',            {'restore':1}           )
@@ -1001,26 +1001,24 @@ call AddCom( '^\s*for',           s:EOL,  "  in ___\n___\nendfor" . Repeat("\<UP
 call AddCom( '^\s*while',         s:EOL,  " \n___\nendwhile\<UP>\<UP>",                               {'filetype' : 'vim'} )
 
 " CPP sematic complete.
-call AddCom( '^\s*\(if\|else if\)',
-			\ s:EOL,
-			\ " ()\n{\n___\n}" . Repeat("\<UP>" , 3 , "\<RIGHT>" , 9, "\<LEFT>", 1),
-			\ {'filetype' : 'c,cpp,java'} )
-call AddCom( '^\s*else',           s:EOL,  "\n{\n-\n}\<UP>\<RIGHT>\<DEL>",                                        {'filetype' : 'c,cpp,java'} )
-call AddCom( '^\s*for',            s:EOL,  " (; ___; ___)\n{\n___\n}" . Repeat("\<UP>" , 3 , "\<RIGHT>" , 4),     {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*\(if\|else if\)',s:EOL,  " ()\n{\n___\n}" . Repeat("\<UP>" , 3 , "\<RIGHT>" , 9, "\<LEFT>", 1),  {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*else',           s:EOL,  "\n{\n-\n}\<UP>\<RIGHT>\<DEL>",                                         {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*for',            s:EOL,  " (; ___; ___)\n{\n___\n}" . Repeat("\<UP>" , 3 , "\<RIGHT>" , 4),      {'filetype' : 'c,cpp,java'} )
 call AddCom( '^\s*fore\%[ach]',    s:EOL,  "\<C-W>for ( : ___)\n{\n___\n}" . Repeat("\<UP>" , 3 , "\<RIGHT>" , 4), {'filetype' : 'c,cpp,java'} )
-call AddCom( '^\s*while',          s:EOL,  " ()\n{\n___\n}" . Repeat("\<UP>", 3, "\<RIGHT>", 6),                  {'filetype' : 'c,cpp,java'} )
-call AddCom( '^\s*do',             s:EOL,  "\n{\n-\n} while (___);\<UP>\<BS>",                                    {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*while',          s:EOL,  " ()\n{\n___\n}" . Repeat("\<UP>", 3, "\<RIGHT>", 6),                   {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*do',             s:EOL,  "\n{\n-\n} while (___);\<UP>\<BS>",                                     {'filetype' : 'c,cpp,java'} )
 call AddCom( '^\s*switch',
 			\ s:EOL,
 			\ " ()\n{\n".Repeat("case ___:\n___\n\<C-D>\<C-D>break;\n", 3)."default:\n___\n\<C-D>\<C-D>break;\n}".Repeat("\<UP>", 14, "\<RIGHT>", 7),
 			\ {'filetype' : 'c,cpp,java'} )
 
 " Shell sematic complete.
-call AddCom( '^\s*if',    s:EOL, " [  ]; then\n___\n\<C-D>fi" . Repeat("\<UP>", 2, "\<RIGHT>", 3),         {'filetype' : 'sh'} )
-call AddCom( '^\s*elif',  s:EOL, " [  ]; then\n___\<UP>",                                                  {'filetype' : 'sh'} )
-call AddCom( '^\s*else',  s:EOL, "\n",                                                                     {'filetype' : 'sh'} )
-call AddCom( '^\s*for',   s:EOL, "  in ___\n\<C-D>do\n___\n\<C-D>\<C-D>done" . Repeat("\<UP>", 3),         {'filetype' : 'sh'} )
-call AddCom( '^\s*while', s:EOL, " \n\<C-D>do\n___\n\<C-D>\<C-D>done" . Repeat("\<UP>", 3, "\<RIGHT>", 2), {'filetype' : 'sh'} )
+call AddCom( '^\s*func\%[tion]', s:EOL, "\<C-w>function \n{\n___\n}" . Repeat("\<UP>", 3, "\<RIGHT>", 9), {'filetype' : 'sh'} )
+call AddCom( '^\s*if',           s:EOL, " [  ]; then\n___\n\<C-D>fi" . Repeat("\<UP>", 2, "\<RIGHT>", 3), {'filetype' : 'sh'} )
+call AddCom( '^\s*elif',         s:EOL, " [  ]; then\n___\<UP>",                                          {'filetype' : 'sh'} )
+call AddCom( '^\s*else',         s:EOL, "\n",                                                             {'filetype' : 'sh'} )
+call AddCom( '^\s*for',          s:EOL, "  in ___\ndo\n___\ndone" . Repeat("\<UP>", 3),                   {'filetype' : 'sh'} )
+call AddCom( '^\s*while',        s:EOL, " \ndo\n___\ndone" . Repeat("\<UP>", 3, "\<RIGHT>", 2),           {'filetype' : 'sh'} )
 call AddCom( '^\s*case',
 			\ s:EOL,
 			\ "  in\n___)\n___;;\n" . Repeat("\<C-D>___)\n___;;\n", 2) . "\<C-D>\*)\n___;;\n\<C-D>\<C-D>esac" . Repeat("\<UP>", 9, "\<RIGHT>", 1),
@@ -1131,10 +1129,12 @@ endfunc
 " |                        10. PIECEMEAL FEATURES                        |
 " +----------------------------------------------------------------------+
 " (1) Into command-mode with ; instead of <S-;>.
+:silent! nnoremap <unique> , ;
 :silent! nnoremap <unique> ; :
+:silent! vnoremap <unique> , ;
 :silent! vnoremap <unique> ; :
 " (2) Delete the part of current line before cursor, than into insert mode.
-:silent! nnoremap <unique> T hv^s
+:silent! nnoremap <unique> F hv^s
 " (3) Upper/Lower case switch.
 "--Transfer recording ability to Q.
 :silent! nnoremap <unique> Q q
