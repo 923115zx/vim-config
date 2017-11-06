@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-11-06 10:19:37
+"      LastModified                : 2017-11-06 14:52:16
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -108,6 +108,10 @@ set nolist
 " Actually I don't know what it matchs.
 highlight InvisibleSpaces ctermfg=Black ctermbg=Black
 call matchadd('InvisibleSpaces', '\s\+\%#', 100)
+
+set ttyfast
+"set ttymouse=xterm
+"set mouse=a
 
 " +----------------------------------------------------------------------+
 " |                         COMMON SETTINGS END                          |
