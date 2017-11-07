@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-11-06 14:52:16
+"      LastModified                : 2017-11-07 17:28:59
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -109,9 +109,18 @@ set nolist
 highlight InvisibleSpaces ctermfg=Black ctermbg=Black
 call matchadd('InvisibleSpaces', '\s\+\%#', 100)
 
+" Fast connection.
 set ttyfast
+" Using mouse on terminal.
 "set ttymouse=xterm
 "set mouse=a
+
+" Auto set expandtab when starting to edit a python file.
+augroup vim_config
+	au!
+	autocmd InsertEnter *.py set expandtab
+	autocmd InsertLeave *.py set noexpandtab
+augroup end
 
 " +----------------------------------------------------------------------+
 " |                         COMMON SETTINGS END                          |
@@ -1480,7 +1489,6 @@ endfunc
 
 " (18) Restore cursor when openning file.
 augroup vim_config
-	au!
 	autocmd BufReadPost *
 		\ if line("'\"") > 1 && line("'\"") <= line("$") |
 		\   exe "normal! g`\"" |
