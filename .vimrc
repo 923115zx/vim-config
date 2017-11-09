@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-11-07 17:28:59
+"      LastModified                : 2017-11-09 10:16:43
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1096,7 +1096,7 @@ func! GetCChunkComAddition(left, right)
 		return addition
 	endif
 	let chunktype = GetChunkType(line('.'))
-	if a:left=='{' && a:right==s:EOL && chunktype!=""
+	if a:left=='{' && a:right==s:NOTHING && chunktype!=""
 		let extra_comment = ";"
 		if chunktype == 'namespace'
 			let extra_comment .= " \/\* namespace " . GetChunkName(line('.')) . " \*\/"
