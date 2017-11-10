@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-11-09 10:16:43
+"      LastModified                : 2017-11-09 10:41:27
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -103,6 +103,7 @@ set fileformats=unix,mac,dos
 set noshowmode			" Cmdline shows no what mode now, airline could do that.
 
 " Very funny feature, listchars. Copyed from Damian Conway's .vimrc.
+" Activate map and autocmd see piecemeal 21.
 set listchars=tab:⇒·,trail:␣,nbsp:~"
 set nolist
 " Actually I don't know what it matchs.
@@ -111,16 +112,22 @@ call matchadd('InvisibleSpaces', '\s\+\%#', 100)
 
 " Fast connection.
 set ttyfast
-" Using mouse on terminal.
+" Using mouse on terminal. I don't need this.
 "set ttymouse=xterm
 "set mouse=a
 
-" Auto set expandtab when starting to edit a python file.
+" Replace tab with spaces in python file.
 augroup vim_config
 	au!
 	autocmd InsertEnter *.py set expandtab
 	autocmd InsertLeave *.py set noexpandtab
 augroup end
+
+" System clipboard shortcuts.
+:silent! nnoremap <C-c> "+yy
+:silent! vnoremap <C-c> "+y
+:silent! nnoremap <C-p> "+p
+:silent! vnoremap <C-p> "+p
 
 " +----------------------------------------------------------------------+
 " |                         COMMON SETTINGS END                          |
