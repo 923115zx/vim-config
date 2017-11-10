@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-11-09 10:41:27
+"      LastModified                : 2017-11-10 12:58:20
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -122,12 +122,6 @@ augroup vim_config
 	autocmd InsertEnter *.py set expandtab
 	autocmd InsertLeave *.py set noexpandtab
 augroup end
-
-" System clipboard shortcuts.
-:silent! nnoremap <C-c> "+yy
-:silent! vnoremap <C-c> "+y
-:silent! nnoremap <C-p> "+p
-:silent! vnoremap <C-p> "+p
 
 " +----------------------------------------------------------------------+
 " |                         COMMON SETTINGS END                          |
@@ -1567,6 +1561,30 @@ func! GetCorrectBgs()
 		let s:guibg = "guibg=White"
 	endif
 endfunc
+
+" (24) Using system clipboard.
+
+" System clipboard shortcuts. Want to use system clipboard, need to check if your vim
+" support clipboard. If you using xterm to connect remote machine and run vim on
+" peer, need to check xterm_clipboard.
+
+" To check vim features, open vim, then type :version, then all info about current vim
+" will echo out. If there are '+clipboard' and '+xterm_clipboard', means your vim support
+" system clipboard. If presents '-clipboard' and '-xterm_clipboard', you need to install
+" these feature to make vim support share system clipboard.
+
+" Feature installation:
+" On Debian/ubuntu: apt-get install vim-gtk or apt-get install vim-gnome.
+" On rhel/centos/fedora: yum install vim-X11, then using vimx instead of vim.
+" On Mac: gvim or MacVim support clipboard by default.
+" (In rhel, you could set an alias for vimx to vim.)
+
+" Remote copy: TODO
+"
+:silent! nnoremap <C-c> "+yy
+:silent! vnoremap <C-c> "+y
+:silent! nnoremap <C-p> "+p
+:silent! vnoremap <C-p> "+p
 
 " +----------------------------------------------------------------------+
 " |                        PIECEMEAL FEATURE END                         |
