@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-11-10 12:58:20
+"      LastModified                : 2017-11-15 17:09:20
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1015,12 +1015,15 @@ call AddCom( '^\s*for',           s:EOL,  "  in ___\n___\nendfor" . Repeat("\<UP
 call AddCom( '^\s*while',         s:EOL,  " \n___\nendwhile\<UP>\<UP>",                               {'filetype' : 'vim'} )
 
 " CPP sematic complete.
-call AddCom( '^\s*\(if\|else if\)',s:EOL,  " ()\n{\n___\n}" . Repeat("\<UP>" , 3 , "\<RIGHT>" , 9, "\<LEFT>", 1),  {'filetype' : 'c,cpp,java'} )
-call AddCom( '^\s*else',           s:EOL,  "\n{\n-\n}\<UP>\<RIGHT>\<DEL>",                                         {'filetype' : 'c,cpp,java'} )
-call AddCom( '^\s*for',            s:EOL,  " (; ___; ___)\n{\n___\n}" . Repeat("\<UP>" , 3 , "\<RIGHT>" , 4),      {'filetype' : 'c,cpp,java'} )
-call AddCom( '^\s*fore\%[ach]',    s:EOL,  "\<C-W>for ( : ___)\n{\n___\n}" . Repeat("\<UP>" , 3 , "\<RIGHT>" , 4), {'filetype' : 'c,cpp,java'} )
-call AddCom( '^\s*while',          s:EOL,  " ()\n{\n___\n}" . Repeat("\<UP>", 3, "\<RIGHT>", 6),                   {'filetype' : 'c,cpp,java'} )
-call AddCom( '^\s*do',             s:EOL,  "\n{\n-\n} while (___);\<UP>\<BS>",                                     {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*\(if\|else if\)',     s:EOL,  " ()\n{\n___\n}" . Repeat("\<UP>" , 3 , "\<RIGHT>" , 9, "\<LEFT>", 1),  {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*ifs\%[imple]',        s:EOL,  "\<C-w>if ()\n___\<UP>\<LEFT>",                                         {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*else ifs\%[imple]',   s:EOL,  "\<C-w>\<C-w>else if ()\n___\<UP>" . Repeat("\<RIGHT>", 2),             {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*else',                s:EOL,  "\n{\n-\n}\<UP>\<RIGHT>\<DEL>",                                         {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*elses\%[imple]',      s:EOL,  "\<C-w>else ()\n___\<UP>\<LEFT>",                                       {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*for',                 s:EOL,  " (; ___; ___)\n{\n___\n}" . Repeat("\<UP>" , 3 , "\<RIGHT>" , 4),      {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*fore\%[ach]',         s:EOL,  "\<C-W>for ( : ___)\n{\n___\n}" . Repeat("\<UP>" , 3 , "\<RIGHT>" , 4), {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*while',               s:EOL,  " ()\n{\n___\n}" . Repeat("\<UP>", 3, "\<RIGHT>", 6),                   {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*do',                  s:EOL,  "\n{\n-\n} while (___);\<UP>\<BS>",                                     {'filetype' : 'c,cpp,java'} )
 call AddCom( '^\s*switch',
 			\ s:EOL,
 			\ " ()\n{\n".Repeat("case ___:\n___\n\<C-D>\<C-D>break;\n", 3)."default:\n___\n\<C-D>\<C-D>break;\n}".Repeat("\<UP>", 14, "\<RIGHT>", 7),
