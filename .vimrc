@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-11-16 22:19:00
+"      LastModified                : 2017-12-07 12:33:18
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -117,10 +117,17 @@ set ttyfast
 "set mouse=a
 
 " Replace tab with spaces in python file.
+let s:defaultCinw = ""
 augroup vim_config
 	au!
-	autocmd InsertEnter *.py set expandtab
-	autocmd InsertLeave *.py set noexpandtab
+	autocmd InsertEnter *.py let s:defaultCinw = &cinwords |
+				\ set expandtab |
+				\ set smarttab |
+				\ set cinwords=if,elif,else,for,while,try,except,finally,def,class
+	autocmd InsertLeave *.py set noexpandtab |
+				\ set nosmarttab |
+				\ set cinwords=s:defaultCinw
+"				\ :silent! %s/^\s*\t/\=repeat("\<Space>", &tabstop)/g
 augroup end
 
 " +----------------------------------------------------------------------+
