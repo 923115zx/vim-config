@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-12-07 12:33:18
+"      LastModified                : 2017-12-07 12:41:10
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -126,8 +126,8 @@ augroup vim_config
 				\ set cinwords=if,elif,else,for,while,try,except,finally,def,class
 	autocmd InsertLeave *.py set noexpandtab |
 				\ set nosmarttab |
-				\ set cinwords=s:defaultCinw
-"				\ :silent! %s/^\s*\t/\=repeat("\<Space>", &tabstop)/g
+				\ set cinwords=s:defaultCinw |
+				\ :silent! %s/^\s*\zs\t/\=repeat("\<Space>", &tabstop)/g
 augroup end
 
 " +----------------------------------------------------------------------+
