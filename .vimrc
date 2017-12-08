@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-12-07 16:27:57
+"      LastModified                : 2017-12-08 13:52:38
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -127,7 +127,10 @@ augroup vim_config
 	autocmd InsertLeave *.py set noexpandtab |
 				\ set nosmarttab |
 				\ set cinwords=s:defaultCinw |
-				\ :silent! %s/^ *\zs\t\+\ze\S/\=substitute(submatch(0), "\t", repeat("\<Space>", &tabstop), "g")/g
+				\ let cur_pos__ = getpos('.') |
+				\ let cur_pos__[2] = screencol() |
+				\ :silent! %s/^ *\zs\t\+\ze\S/\=substitute(submatch(0), "\t", repeat("\<Space>", &tabstop), "g")/g |
+				\ call setpos('.', cur_pos__)
 augroup end
 
 " +----------------------------------------------------------------------+
@@ -1402,7 +1405,11 @@ endfunc
 
 " (12) Test function. Used to do some experiment.
 func! GetCol()
-"	let l:cur_pos = getpos('.')
+	let l:cur_pos = getpos('.')
+	let l:cur_lnum = cur_pos[1]
+	let l:cur_col = cur_pos[2]
+	let l:cur_off = cur_pos[3]
+	echo "lnum=" . cur_lnum . ", col=" . cur_col . ", off=" . cur_off
 "	let l:cur_col = cur_pos[2]
 "	let l:cur_line_text = getline('.')
 "	let l:cur_col_char = l:cur_line_text[l:cur_col]
