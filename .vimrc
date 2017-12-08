@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-12-08 13:52:38
+"      LastModified                : 2017-12-08 18:47:21
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1631,6 +1631,24 @@ endfunc
 
 func! s:Spaces(count)
 	return repeat(" ", a:count)
+endfunc
+
+func! s:CreateTitle()
+	if !has_key(s:commentSymbols, &filetype)
+		return
+	endif
+
+	" coding setting must be written on first or second line of file.
+	if &filetype == 'python'
+		call append(line('$')-1, '#!/usr/bin/env python3')
+		call append(line('$')-1, '# -*- coding: utf-8 -*-')
+		call append(line('$')-1, '')
+	endif
+	let comm_m = s:commentstring[&filetype]
+	let comm_s = comm_m
+	let comm_e = comm_m
+	if &filetype == 'c' || &filetype == 'cpp' || &filetype == 'java'
+	endif
 endfunc
 
 func! s:CreateFile()
