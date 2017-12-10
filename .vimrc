@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-12-08 18:47:21
+"      LastModified                : 2017-12-10 23:53:33
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1637,18 +1637,39 @@ func! s:CreateTitle()
 	if !has_key(s:commentSymbols, &filetype)
 		return
 	endif
-
 	" coding setting must be written on first or second line of file.
 	if &filetype == 'python'
 		call append(line('$')-1, '#!/usr/bin/env python3')
 		call append(line('$')-1, '# -*- coding: utf-8 -*-')
 		call append(line('$')-1, '')
 	endif
+"	let comm_m = s:commentstring[&filetype]
+"	let comm_s = comm_m
+"	let comm_e = comm_m
+"	if &filetype == 'c' || &filetype == 'cpp' || &filetype == 'java'
+"	endif
+endfunc
+
+func! s:AddCommTitle()
+	let commTitle = []
 	let comm_m = s:commentstring[&filetype]
 	let comm_s = comm_m
 	let comm_e = comm_m
 	if &filetype == 'c' || &filetype == 'cpp' || &filetype == 'java'
+		comm_s = '/*'
+		comm_m = ' *'
+		comm_e = ' */'
+	elseif &filetype == 'python'
+		comm_s = '"""'
+		comm_m = ''
+		comm_e = '"""'
 	endif
+	let alignPat = "%-*s : %*s"
+	call add(commTitle, comm_s)
+	call add(commTitle, comm_m . printf(alignPat, 15, "File", 20, expand('%')))
+	call add(commTitle, comm_m . printf(alignPat, 15, "Author", 20, "ZhaoXin"))
+	call add(commTitle, comm_m . printf(alignPat, 15, "CreateTime", 20, strftime("%Y-%m-%d %T")))
+	call add(commTitle, comm_m . printf(alignPat, 15, "LastModified", 20, strftime("%Y-%m-%d %T")))
 endfunc
 
 func! s:CreateFile()
