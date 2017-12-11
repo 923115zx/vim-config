@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-12-11 14:26:42
+"      LastModified                : 2017-12-11 22:54:14
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1618,6 +1618,7 @@ endfunc
 augroup vim_config
 	autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 "	autocmd BufNewFile * :call <SID>CreateFile()
+	autocmd BufNewFile *.py :call <SID>AddFrame_py()
 	autocmd BufNewFile *.sh :call <SID>AddFrame_sh()
 	autocmd BufNewFile * :call <SID>CreateTitle()
 	autocmd BufNewFile *.h :call <SID>AddFrame_h()
@@ -1640,31 +1641,6 @@ func! s:CreateTitle()
 	if !has_key(s:commentSymbols, &filetype)
 		return
 	endif
-	" coding setting must be written on first or second line of file.
-	if &filetype == 'python'
-		call append(line('$')-1, '#!/usr/bin/env python3')
-		call append(line('$')-1, '# -*- coding: utf-8 -*-')
-		call append(line('$')-1, '')
-	endif
-	call s:AddCommTitle()
-endfunc
-
-func! s:AddFrame_h()
-	let filename = expand('%')
-	let filename[strridx(filename, '.')] = '_'
-	call append(line('$')-1, "")
-	call append(line('$')-1, printf("#ifndef _%s_", toupper(filename)))
-	call append(line('$')-1, printf("#define _%s_", toupper(filename)))
-	call append(line('$')-1, "")
-	call append(line('$')-1, "#endif    /* " . expand("%") . " */")
-endfunc
-
-func! s:AddFrame_sh()
-	call append(line('$')-1, "\#!/usr/bin/env bash")
-	call append(line('$')-1, "")
-endfunc
-
-func! s:AddCommTitle()
 	let commTitle = []
 	let comm_m = s:commentSymbols[&filetype]
 	let comm_s = comm_m
@@ -1691,6 +1667,32 @@ func! s:AddCommTitle()
 	endfor
 endfunc
 
+func! s:AddFrame_py()
+	" coding setting must be written on first or second line of file.
+	if &filetype == 'python'
+		call append(line('$')-1, '#!/usr/bin/env python3')
+		call append(line('$')-1, '# -*- coding: utf-8 -*-')
+		call append(line('$')-1, '')
+	endif
+endfunc
+
+func! s:AddFrame_h()
+	let filename = expand('%')
+	let lastDotPos = strridx(filename, '.')
+	let filename = filename[0:lastDotPos-1] . '_' . filename[lastDotPos+1:]
+	call append(line('$')-1, "")
+	call append(line('$')-1, printf("#ifndef _%s_", toupper(filename)))
+	call append(line('$')-1, printf("#define _%s_", toupper(filename)))
+	call append(line('$')-1, "")
+	call append(line('$')-1, "#endif    /* " . expand("%") . " */")
+endfunc
+
+func! s:AddFrame_sh()
+	call append(line('$')-1, "\#!/usr/bin/env bash")
+	call append(line('$')-1, "")
+endfunc
+
+" A little bit complicated. Temparorily not use now.
 func! s:CreateFile()
 	let topping_len = 71
 	let bottom_len = 71
