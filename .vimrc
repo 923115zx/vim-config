@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-12-10 23:53:33
+"      LastModified                : 2017-12-11 14:26:42
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1617,7 +1617,10 @@ endfunc
 "	FileReadPre/FileReadPost----any other file read.
 augroup vim_config
 	autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
-	autocmd BufNewFile * :call <SID>CreateFile()
+"	autocmd BufNewFile * :call <SID>CreateFile()
+	autocmd BufNewFile *.sh :call <SID>AddFrame_sh()
+	autocmd BufNewFile * :call <SID>CreateTitle()
+	autocmd BufNewFile *.h :call <SID>AddFrame_h()
 "	autocmd BufNewFile *.asm :call BuildSandbox()
 	autocmd BufWritePre,FileWritePre * let cur_pos__=getpos('.')
 			\|call <SID>LastModFresh()|call setpos('.', cur_pos__)
@@ -1643,33 +1646,49 @@ func! s:CreateTitle()
 		call append(line('$')-1, '# -*- coding: utf-8 -*-')
 		call append(line('$')-1, '')
 	endif
-"	let comm_m = s:commentstring[&filetype]
-"	let comm_s = comm_m
-"	let comm_e = comm_m
-"	if &filetype == 'c' || &filetype == 'cpp' || &filetype == 'java'
-"	endif
+	call s:AddCommTitle()
+endfunc
+
+func! s:AddFrame_h()
+	let filename = expand('%')
+	let filename[strridx(filename, '.')] = '_'
+	call append(line('$')-1, "")
+	call append(line('$')-1, printf("#ifndef _%s_", toupper(filename)))
+	call append(line('$')-1, printf("#define _%s_", toupper(filename)))
+	call append(line('$')-1, "")
+	call append(line('$')-1, "#endif    /* " . expand("%") . " */")
+endfunc
+
+func! s:AddFrame_sh()
+	call append(line('$')-1, "\#!/usr/bin/env bash")
+	call append(line('$')-1, "")
 endfunc
 
 func! s:AddCommTitle()
 	let commTitle = []
-	let comm_m = s:commentstring[&filetype]
+	let comm_m = s:commentSymbols[&filetype]
 	let comm_s = comm_m
 	let comm_e = comm_m
 	if &filetype == 'c' || &filetype == 'cpp' || &filetype == 'java'
-		comm_s = '/*'
-		comm_m = ' *'
-		comm_e = ' */'
+		let comm_s = '/*'
+		let comm_m = ' *'
+		let comm_e = ' */'
 	elseif &filetype == 'python'
-		comm_s = '"""'
-		comm_m = ''
-		comm_e = '"""'
+		let comm_s = '"""'
+		let comm_m = ''
+		let comm_e = '"""'
 	endif
-	let alignPat = "%-*s : %*s"
+	let alignPat = ' %-*s : %-*s'
 	call add(commTitle, comm_s)
 	call add(commTitle, comm_m . printf(alignPat, 15, "File", 20, expand('%')))
 	call add(commTitle, comm_m . printf(alignPat, 15, "Author", 20, "ZhaoXin"))
 	call add(commTitle, comm_m . printf(alignPat, 15, "CreateTime", 20, strftime("%Y-%m-%d %T")))
 	call add(commTitle, comm_m . printf(alignPat, 15, "LastModified", 20, strftime("%Y-%m-%d %T")))
+	call add(commTitle, comm_m . printf(alignPat, 15, "Vim", 20, "ts=".&ts.", sw=".&sw))
+	call add(commTitle, comm_e)
+	for titleLine in commTitle
+		call append(line('$')-1, titleLine)
+	endfor
 endfunc
 
 func! s:CreateFile()
