@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-12-11 22:54:14
+"      LastModified                : 2017-12-12 17:43:38
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -127,11 +127,25 @@ augroup vim_config
 	autocmd InsertLeave *.py set noexpandtab |
 				\ set nosmarttab |
 				\ set cinwords=s:defaultCinw |
-				\ let cur_pos__ = getpos('.') |
-				\ let cur_pos__[2] = screencol() |
+				\ let save_cursor = getpos(".") |
+				\ let save_cursor[2] = save_cursor[2] + s:tab2space() |
 				\ :silent! %s/^ *\zs\t\+\ze\S/\=substitute(submatch(0), "\t", repeat("\<Space>", &tabstop), "g")/g |
-				\ call setpos('.', cur_pos__)
+				\ :call setpos('.', save_cursor)
 augroup end
+
+" Return 3 times of the number that how many tabs in ahead of current line.
+func! s:tab2space()
+	let cur_line = getline('.')
+	let tcount = 0
+	for idx in range(strlen(cur_line))
+		if cur_line[idx] == "\t"
+			let tcount = tcount + 1
+		else
+			break
+		endif
+	endfor
+	return 3*tcount
+endfunc
 
 " +----------------------------------------------------------------------+
 " |                         COMMON SETTINGS END                          |
@@ -1405,11 +1419,14 @@ endfunc
 
 " (12) Test function. Used to do some experiment.
 func! GetCol()
-	let l:cur_pos = getpos('.')
-	let l:cur_lnum = cur_pos[1]
-	let l:cur_col = cur_pos[2]
-	let l:cur_off = cur_pos[3]
-	echo "lnum=" . cur_lnum . ", col=" . cur_col . ", off=" . cur_off
+"	let l:cur_pos = getpos('.')
+"	let l:cur_lnum = cur_pos[1]
+"	let l:cur_col = cur_pos[2]
+"	let l:cur_off = cur_pos[3]
+"	echo "lnum=" . cur_lnum . ", col=" . cur_col . ", off=" . cur_off
+
+	echo "screencol = " . screencol()
+
 "	let l:cur_col = cur_pos[2]
 "	let l:cur_line_text = getline('.')
 "	let l:cur_col_char = l:cur_line_text[l:cur_col]
@@ -1427,11 +1444,12 @@ func! GetCol()
 "		echo synIDattr(id, "name")
 "	endfor
 "	echo synIDattr(synID(line('.'), col('.'), 0), "name")
-	let res = ""
-	for i in range(0, -1, 2)
-		let res .= i
-	endfor
-	echo res
+
+"	let res = ""
+"	for i in range(0, -1, 2)
+"		let res .= i
+"	endfor
+"	echo res
 
 	"echo l:cur_col
 	"echo l:cur_col_char
