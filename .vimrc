@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-12-12 17:43:38
+"      LastModified                : 2017-12-17 20:29:52
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -197,6 +197,13 @@ let s:commentSymbols = {
 				\ 'asm' 	: ';',
 			\}
 
+let s:commentSymbols_plus = {
+			\ 'cmake'   : '#',
+			\ 'resolv'  : '#',
+			\ 'crontab' : '#',
+			\ 'dosini'  : '#',
+			\}
+
 " Prepare to write a single line comment.
 func! s:WriteComment()
 	if &filetype == ''
@@ -218,7 +225,11 @@ endfunc
 
 " Get commentstring for current filetype, replace '%s' to ' '.
 func! s:GetCommentString()
-	let cmstr = get(s:commentSymbols, &filetype, &commentstring)
+	let cmstr = get(s:commentSymbols, &filetype, -1)
+	if cmstr == -1
+		let cmstr = get(s:commentSymbols_plus, &filetype, &commentstring)
+	endif
+"	let cmstr = get(s:commentSymbols, &filetype, &commentstring)
 	if cmstr == '/*%s*/'
 		return '//'
 	endif
