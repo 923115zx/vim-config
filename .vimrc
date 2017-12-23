@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-12-25 14:16:18
+"      LastModified                : 2017-12-23 19:23:17
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -22,6 +22,7 @@ set nu
 set showmatch
 set cursorline
 set cursorcolumn
+"let g:go_version_warning = 0
 " Colorscheme solarized global variables.
 let g:solarized_termcolors=&t_Co
 let g:solarized_contrast="high"
@@ -762,9 +763,9 @@ let BS = '<C-h>'
 if OS =~ "Darwin.*"
 	let BS = '<BS>'
 endif
-exe ":silent! inoremap <unique> <silent> <expr> " . BS . " DeletePairedSymbols()"
+exe ":silent! inoremap <unique> <silent> " . BS . " <C-R>=DeletePairedSymbols()<CR>"
 " Map <C-\> to delete right part of '()' or other empty parenthese.
-:silent! inoremap <unique> <silent> <expr> <C-\> DeleteRedundandRightSymbol()
+:silent! inoremap <unique> <silent> <C-\> <C-R>=DeleteRedundandRightSymbol()<CR>
 
 " template is not stl container name, but it followed <> too, so add it here.
 let s:STLContainers = [
@@ -1335,10 +1336,27 @@ endfunc
 
 " (9) Popup menu mappings.
 " On mac os, just input <C-e> is not work when ycm loaded, So change it to <C-e><ESC>a.
-:silent! inoremap <unique> <expr> <ESC> pumvisible() ? "\<C-E>\<ESC>a" : "\<ESC>"
-:silent! inoremap <unique> <expr> <CR>  pumvisible() ? "\<C-Y>\<ESC>a" : "\<CR>"
-:silent! inoremap <unique> <expr> <C-j> pumvisible() ? "\<C-N>" : "\<Down>"
-:silent! inoremap <unique> <expr> <C-k> pumvisible() ? "\<C-P>" : "\<Up>"
+":silent! inoremap <unique> <expr> <ESC> pumvisible() ? "\<C-E>\<ESC>a" : "\<ESC>"
+":silent! inoremap <unique> <expr> <CR>  pumvisible() ? "\<C-Y>\<ESC>a" : "\<CR>"
+":silent! inoremap <unique> <expr> <C-j> pumvisible() ? "\<C-N>" : "\<Down>"
+":silent! inoremap <unique> <expr> <C-k> pumvisible() ? "\<C-P>" : "\<Up>"
+" ESC can't be mapped if you want use <up>, <down>, <left> or <right> in imode.
+:silent! inoremap <unique> <silent> <ESC> <C-R>=Pum_esc()<CR>
+:silent! inoremap <unique> <silent> <CR> <C-R>=Pum_cr()<CR>
+:silent! inoremap <unique> <silent> <C-j> <C-R>=Pum_next()<CR>
+:silent! inoremap <unique> <silent> <C-k> <C-R>=Pum_prev()<CR>
+func! Pum_esc()
+	return pumvisible() ? "\<C-E>\<ESC>a" : "\<ESC>"
+endfunc
+func! Pum_cr()
+	return pumvisible() ? "\<C-Y>\<ESC>a" : "\<CR>"
+endfunc
+func! Pum_next()
+	return pumvisible() ? "\<C-N>" : "\<Down>"
+endfunc
+func! Pum_prev()
+	return pumvisible() ? "\<C-P>" : "\<Up"
+endfunc
 
 " (10) Add and delete spaces.
 " Add a space to current cursor position's left and right respectively. Recognize operator.
