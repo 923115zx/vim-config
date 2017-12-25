@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-12-17 20:29:52
+"      LastModified                : 2017-12-25 14:16:18
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -195,6 +195,7 @@ let s:commentSymbols = {
 				\ 'java' 	: '//',
 				\ 'lua' 	: '--',
 				\ 'asm' 	: ';',
+				\ 'go' 		: '//',
 			\}
 
 let s:commentSymbols_plus = {
