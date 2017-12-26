@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-12-26 11:09:46
+"      LastModified                : 2017-12-26 23:30:41
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1336,27 +1336,27 @@ endfunc
 
 " (9) Popup menu mappings.
 " On mac os, just input <C-e> is not work when ycm loaded, So change it to <C-e><ESC>a.
-":silent! inoremap <unique> <expr> <ESC> pumvisible() ? "\<C-E>\<ESC>a" : "\<ESC>"
-":silent! inoremap <unique> <expr> <CR>  pumvisible() ? "\<C-Y>\<ESC>a" : "\<CR>"
-":silent! inoremap <unique> <expr> <C-j> pumvisible() ? "\<C-N>" : "\<Down>"
-":silent! inoremap <unique> <expr> <C-k> pumvisible() ? "\<C-P>" : "\<Up>"
+:silent! inoremap <unique> <expr> <ESC> pumvisible() ? "\<C-E>\<ESC>a" : "\<ESC>"
+:silent! inoremap <unique> <expr> <CR>  pumvisible() ? "\<C-Y>\<ESC>a" : "\<CR>"
+:silent! inoremap <unique> <expr> <C-j> pumvisible() ? "\<C-N>" : "\<Down>"
+:silent! inoremap <unique> <expr> <C-k> pumvisible() ? "\<C-P>" : "\<Up>"
 " ESC can't be mapped if you want use <up>, <down>, <left> or <right> in imode.
-:silent! inoremap <unique> <silent> <ESC> <C-R>=Pum_esc()<CR>
-:silent! inoremap <unique> <silent> <CR> <C-R>=Pum_cr()<CR>
-:silent! inoremap <unique> <silent> <C-j> <C-R>=Pum_next()<CR>
-:silent! inoremap <unique> <silent> <C-k> <C-R>=Pum_prev()<CR>
-func! Pum_esc()
-	return pumvisible() ? "\<C-E>" : "\<ESC>"
-endfunc
-func! Pum_cr()
-	return pumvisible() ? "\<C-Y>" : "\<CR>"
-endfunc
-func! Pum_next()
-	return pumvisible() ? "\<C-N>" : "\<Down>"
-endfunc
-func! Pum_prev()
-	return pumvisible() ? "\<C-P>" : "\<Up"
-endfunc
+":silent! inoremap <unique> <silent> <ESC> <C-R>=Pum_esc()<CR>
+":silent! inoremap <unique> <silent> <CR> <C-R>=Pum_cr()<CR>
+":silent! inoremap <unique> <silent> <C-j> <C-R>=Pum_next()<CR>
+":silent! inoremap <unique> <silent> <C-k> <C-R>=Pum_prev()<CR>
+"func! Pum_esc()
+"	return pumvisible() ? "\<C-E>" : "\<ESC>"
+"endfunc
+"func! Pum_cr()
+"	return pumvisible() ? "\<C-Y>" : "\<CR>"
+"endfunc
+"func! Pum_next()
+"	return pumvisible() ? "\<C-N>" : "\<Down>"
+"endfunc
+"func! Pum_prev()
+"	return pumvisible() ? "\<C-P>" : "\<Up"
+"endfunc
 
 " (10) Add and delete spaces.
 " Add a space to current cursor position's left and right respectively. Recognize operator.
