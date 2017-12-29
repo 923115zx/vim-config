@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-12-28 17:37:36
+"      LastModified                : 2017-12-29 17:03:48
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1809,8 +1809,7 @@ func! s:LastModFresh()
 	else
 		let l = line("$")
 	endif
-	exe "silent 1," . l . "g/LastModified/s/LastModified.*/LastModified" . s:Spaces(16) . ": " .
-				\ strftime("%Y-%m-%d %T")
+	exe "silent 1," . l . "g/LastModified/s/:.*/: " . strftime("%Y-%m-%d %T")
 endfunc
 " +----------------------------------------------------------------------+
 " |                        TITLE AUTO SETTER END                         |
