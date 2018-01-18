@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2017-12-29 17:03:48
+"      LastModified                : 2018-01-18 13:42:36
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1336,11 +1336,15 @@ endfunc
 
 " (9) Popup menu mappings.
 " On mac os, just input <C-e> is not work when ycm loaded, So change it to <C-e><ESC>a.
-if OS =~ "Darwin.*"
-	:silent! inoremap <unique> <expr> <ESC> pumvisible() ? "\<C-E>\<ESC>a" : "\<ESC>"
-else
-	:silent! inoremap <unique> <silent> <ESC> <C-R>=Pum_esc()<CR>
-endif
+"if OS =~ "Darwin.*"
+"	:silent! inoremap <unique> <expr> <ESC> pumvisible() ? "\<C-E>\<ESC>a" : "\<ESC>"
+"else
+"	:silent! inoremap <unique> <silent> <ESC> <C-R>=Pum_esc()<CR>
+"endif
+
+" **** map <ESC> will cause <>^v input ABCD in insert mode. I don't need it, but if anyone
+" **** want to use cursor arrow in insert mode, just comment it or change to use Pum_esc.
+:silent! inoremap <unique> <expr> <ESC> pumvisible() ? "\<C-E>\<ESC>a" : "\<ESC>"
 :silent! inoremap <unique> <expr> <CR>  pumvisible() ? "\<C-Y>\<ESC>a" : "\<CR>"
 :silent! inoremap <unique> <expr> <C-j> pumvisible() ? "\<C-N>" : "\<Down>"
 :silent! inoremap <unique> <expr> <C-k> pumvisible() ? "\<C-P>" : "\<Up>"
@@ -1913,6 +1917,8 @@ let g:ycm_warning_symbol = '->'
 let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
 let g:ycm_always_populate_location_list = 1
 let g:ycm_echo_current_diagnostic = 1
+" Under ubuntu, without defining ycm_server_python_interpreter will cause ycm shutdown.
+let g:ycm_server_python_interpreter = '/usr/bin/python'
 :silent! nnoremap <unique> <silent> <Leader>t :YcmCompleter GoToDefinitionElseDeclaration<CR>
 ":silent! nnoremap <unique> <silent> <Leader>f :YcmCompleter GoToInclude<CR>
 ":silent! nnoremap <unique> <silent> <Leader>g :YcmCompleter GoToDefinition<CR>
