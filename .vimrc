@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2018-01-18 13:44:22
+"      LastModified                : 2018-01-18 20:20:18
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1914,6 +1914,7 @@ endif
 
 let g:ycm_key_list_select_completion = []
 let g:ycm_key_list_previous_completion = []
+let g:ycm_key_list_stop_completion = []
 let g:ycm_confirm_extra_conf = 0
 let g:ycm_goto_buffer_command = 'horizontal-split'
 let g:ycm_warning_symbol = '->'
