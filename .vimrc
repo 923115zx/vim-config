@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2018-01-18 20:20:18
+"      LastModified                : 2018-01-24 00:11:32
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1922,7 +1922,9 @@ let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
 let g:ycm_always_populate_location_list = 1
 let g:ycm_echo_current_diagnostic = 1
 " Under ubuntu, without defining ycm_server_python_interpreter will cause ycm shutdown.
-let g:ycm_server_python_interpreter = '/usr/bin/python'
+if OS !~ "Darwin.*"
+	let g:ycm_server_python_interpreter = '/usr/bin/python'
+endif
 :silent! nnoremap <unique> <silent> <Leader>t :YcmCompleter GoToDefinitionElseDeclaration<CR>
 ":silent! nnoremap <unique> <silent> <Leader>f :YcmCompleter GoToInclude<CR>
 ":silent! nnoremap <unique> <silent> <Leader>g :YcmCompleter GoToDefinition<CR>
