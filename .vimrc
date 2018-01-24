@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2018-01-24 00:11:32
+"      LastModified                : 2018-01-24 14:28:50
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -50,13 +50,13 @@ if has("gui_running")
 	set background=light
 	set noundofile
 	" Windows gui settings.
-	source $VIMRUNTIME/vimrc_example.vim
+"	source $VIMRUNTIME/vimrc_example.vim
 	"source $VIMRUNTIME/mswin.vim 		" Uncompatible with windows short cuts.
 	behave mswin
 	au GUIEnter * set t_vb=				" No annoying flash.
 	autocmd GUIEnter * simalt ~x 		" Full screen when open gvim.
-"	set guifont=Consolas:h12 			" self-define font in gui.
-	set guifont=PTmono:h16 				" self-define font in gui.
+	set guifont=Consolas:h12 			" self-define font in gui.
+"	set guifont=PTmono:h16 				" self-define font in gui.
 	set guioptions=						" No menu, no scrollbar, no nothing.
 "else
 "	if isdirectory("~/.vim/doc")
