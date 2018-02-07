@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2018-02-02 22:39:23
+"      LastModified                : 2018-02-07 10:13:56
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -758,13 +758,18 @@ call s:RegisterPairedSymbols()
 
 " Map <BS> to delete '()' or other empty parenthese. In theory, <C-h> == <BS>,
 "  but actually mac doesn't recognize <C-h>, and rhel doesn't recognize <BS>.
+
+" XXX: Finally, I got to know why <BS> work for Darwin and <C-h> work for xshell.
+" 		Yes, it's doesn't matter with Linux and Darwin, it's the terminal software.
+" 		In xshell, properties->terminal->keyboard, you will see first priority backspace
+" 		will send crtl-h. That's the old style terminal default option. And iterm2
+" 		in darwin is new, it send ^?. You could change the setting in xshell, then
+" 		just use <BS> here and ok.
 let OS = system("\uname")
-"let BS = '<C-h>'
-"if OS =~ "Darwin.*"
-"	let BS = '<BS>'
-"endif
-"exe ":silent! inoremap <unique> <silent> " . BS . " <C-R>=DeletePairedSymbols()<CR>"
+" We just map <BS> and <C-h> both. I think I will never want to map <C-h> to do other
+" thing.
 :silent! inoremap <unique> <silent> <BS> <C-R>=DeletePairedSymbols()<CR>
+:silent! inoremap <unique> <silent> <C-h> <C-R>=DeletePairedSymbols()<CR>
 " Map <C-\> to delete right part of '()' or other empty parenthese.
 :silent! inoremap <unique> <silent> <C-\> <C-R>=DeleteRedundandRightSymbol()<CR>
 
