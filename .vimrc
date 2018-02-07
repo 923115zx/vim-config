@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2018-02-07 10:13:56
+"      LastModified                : 2018-02-07 10:17:47
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1670,9 +1670,9 @@ endfunc
 augroup vim_config
 	autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 "	autocmd BufNewFile * :call <SID>CreateFile()
+	autocmd BufNewFile * :call <SID>CreateTitle()
 	autocmd BufNewFile *.py :call <SID>AddFrame_py()
 	autocmd BufNewFile *.sh :call <SID>AddFrame_sh()
-	autocmd BufNewFile * :call <SID>CreateTitle()
 	autocmd BufNewFile *.h :call <SID>AddFrame_h()
 "	autocmd BufNewFile *.asm :call BuildSandbox()
 	autocmd BufWritePre,FileWritePre * let cur_pos__=getpos('.')
@@ -1717,6 +1717,7 @@ func! s:CreateTitle()
 	for titleLine in commTitle
 		call append(line('$')-1, titleLine)
 	endfor
+	call append(line('$')-1, '')
 endfunc
 
 func! s:AddFrame_py()
