@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2018-02-07 10:17:47
+"      LastModified                : 2018-03-13 15:56:04
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1200,7 +1200,7 @@ endfunc
 " Toggle uppercase to lowercase or lowercase to uppercase.
 :silent! nnoremap <unique> <expr> q ToupperOrTolower()
 " Make current word to upper case.
-:silent! nnoremap <unique> <Leader>q gUaw
+:silent! nnoremap <unique> <Leader>q :let __pos=getpos(".")<CR>gUaw:call setpos('.', __pos)<CR>lh
 func! ToupperOrTolower()
 	let col = col(".")
 	let line_text = getline(".")
