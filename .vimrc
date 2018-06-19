@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2018-03-15 21:48:05
+"      LastModified                : 2018-06-19 16:54:28
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1036,19 +1036,19 @@ let s:NOTHING  = '\s\='
 let s:EOL      = '\s*$'
 
 "          =left=   =right=    =completion=            =opts=
-call AddCom('{',  s:NOTHING,       '}',            {'restore':1}           )
-call AddCom('\[', s:NOTHING,       "]",            {'restore':1}           )
-call AddCom('(',  s:NOTHING,       ")",            {'restore':1}           )
-call AddCom('<',  s:NOTHING,       '>',            {'restore':1}           )
-call AddCom("'",  s:NOTHING,       "'",            {'restore':1}           )
-call AddCom('"',  s:NOTHING,       '"',            {'restore':1}           )
-call AddCom('\p',    "}",      "\<RIGHT>"                                  )
-call AddCom('{',     '}',     "\<CR>\<ESC>O", {'filetype':'cpp,c,java,sh'} )
-call AddCom('\p',    "]",      "\<RIGHT>"                                  )
-call AddCom('\p',    ")",      "\<RIGHT>"                                  )
-call AddCom('\p',    ">",      "\<RIGHT>"                                  )
-call AddCom('\p',    "'",      "\<RIGHT>"                                  )
-call AddCom('\p',    '"',      "\<RIGHT>"                                  )
+call AddCom('{',  s:NOTHING,       '}',            {'restore':1}              )
+call AddCom('\[', s:NOTHING,       "]",            {'restore':1}              )
+call AddCom('(',  s:NOTHING,       ")",            {'restore':1}              )
+call AddCom('<',  s:NOTHING,       '>',            {'restore':1}              )
+call AddCom("'",  s:NOTHING,       "'",            {'restore':1}              )
+call AddCom('"',  s:NOTHING,       '"',            {'restore':1}              )
+call AddCom('\p',    "}",      "\<RIGHT>"                                     )
+call AddCom('{',     '}',     "\<CR>\<ESC>O", {'filetype':'cpp,c,java,sh,go'} )
+call AddCom('\p',    "]",      "\<RIGHT>"                                     )
+call AddCom('\p',    ")",      "\<RIGHT>"                                     )
+call AddCom('\p',    ">",      "\<RIGHT>"                                     )
+call AddCom('\p',    "'",      "\<RIGHT>"                                     )
+call AddCom('\p',    '"',      "\<RIGHT>"                                     )
 
 " VIM sematic complete.
 call AddCom( '^\s*func\%[tion]',  s:EOL,  "\<C-W>func! \n___\nendfunc\<UP>\<UP>",                     {'filetype' : 'vim'} )
@@ -1964,6 +1964,9 @@ let g:airline_theme='dark'
 "let g:airline#extensions#tabline#left_sep = ' '
 "let g:airline#extensions#tabline#left_alt_sep = '|'
 let g:airline#extensions#tagbar#enabled = 0
+
+" (6) Syntastic
+let g:syntastic_go_checkers = ['go']
 
 " +----------------------------------------------------------------------+
 " |                             PLUGINS END                              |
