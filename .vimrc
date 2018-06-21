@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2018-06-19 16:54:28
+"      LastModified                : 2018-06-21 13:37:40
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -414,36 +414,47 @@ endfunc
 :silent! inoremap <unique> <silent> <C-Y> <C-R>=AddInclude(0)<CR>
 " Add include header preprocess text.
 func! AddInclude(sysheader)
-	if &filetype != 'c' && &filetype != 'cpp'
-		echo "Add include expr function only available in c/c++ file."
+	if &filetype != 'c' && &filetype != 'cpp' && &filetype != 'go'
+		echo "Add include expr function only available in c/c++ and go file."
 		return ''
 	endif
+	let l:isSysHeader = &filetype=='go' ? 0 : a:sysheader
 	if a:sysheader
 		let l:parenthese = "<>"
 	else
 		let l:parenthese = '""'
 	endif
+	let l:includer = "#include "
+	if &filetype == 'go'
+		let l:parenthese = '""'
+		let l:includer = "import "
+	endif
 	let curmode = mode()
 	if curmode == 'i' 		"Insert mode.
 		if s:IsEmptyLine()
-			return "#include " . l:parenthese . "\<Left>"
+			return l:includer . l:parenthese . "\<Left>"
 		else
-			let addtext = "#include " . l:parenthese
+			let addtext = l:includer . l:parenthese
 			call append(line('.'), addtext)
 			call cursor(line('.')+1, strlen(addtext))
 			return ""
 		endif
 	elseif curmode == 'n' 	"Normal mode.
-		if !a:sysheader
+		if !l:isSysHeader
 			let l:parenthese = '"'
 		endif
+		let l:enterInsert = 'o'
+		" If current line is empty, don't open a new line.
 		if s:IsEmptyLine()
-			exe "normal i#include " . l:parenthese
-			return
-		else
-			exe "normal o#include " . l:parenthese
-			return ''
+			let l:enterInsert = 'i'
 		endif
+		exe "normal " . l:enterInsert . l:includer . l:parenthese
+		" Because <> will not automaticlly complete here, so we move cursor right
+		" here for go code.
+		if &filetype == 'go'
+			exe "normal l"
+		endif
+		return ''
 	endif
 	echo "Add include only available in Insert, Normal modes."
 endfunc
