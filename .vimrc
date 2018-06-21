@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2018-06-21 13:37:40
+"      LastModified                : 2018-06-21 17:37:09
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1978,6 +1978,10 @@ let g:airline#extensions#tagbar#enabled = 0
 
 " (6) Syntastic
 let g:syntastic_go_checkers = ['go']
+
+" (7) vim-go
+" annoying
+let g:go_fmt_autosave = 0
 
 " +----------------------------------------------------------------------+
 " |                             PLUGINS END                              |
