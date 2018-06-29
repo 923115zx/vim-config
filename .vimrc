@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2018-06-21 17:37:09
+"      LastModified                : 2018-06-29 10:40:10
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -215,6 +215,9 @@ func! s:WriteComment()
 
 	" Use commentstring instead of s:GetCommentString. Means use /*%s*/.
 	let commentSymbol = &commentstring
+	if &filetype == 'go' 	" go's default commentstring is // %s
+		let commentSymbol = '/*%s*/'
+	endif
 	let commentSymbol_n = substitute(commentSymbol, '\S\zs%s', ' ', '')
 	let commentInput = substitute(commentSymbol_n, '*\/\zs\s*$',
 				\ "\<Left>\<Left>\<Left> ", '')
@@ -536,6 +539,7 @@ func! s:Win2Tab()
 		exe ":q"
 		exe ":tabe"
 		exe ":e " . pwd . "/" . cur_file
+"		echo pwd
 	endif
 endfunc
 "// If define another imap, following mappings will not work, cursor
@@ -1982,6 +1986,7 @@ let g:syntastic_go_checkers = ['go']
 " (7) vim-go
 " annoying
 let g:go_fmt_autosave = 0
+let g:go_gocode_autobuild = 0
 
 " +----------------------------------------------------------------------+
 " |                             PLUGINS END                              |
