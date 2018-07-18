@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2018-06-29 10:40:10
+"      LastModified                : 2018-07-18 21:16:50
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1208,7 +1208,7 @@ endfunc
 :silent! vnoremap <unique> , ;
 :silent! vnoremap <unique> ; :
 " (2) Delete the part of current line before cursor, than into insert mode.
-:silent! nnoremap <unique> F hv^s
+":silent! nnoremap <unique> F hv^s
 " (3) Upper/Lower case switch.
 "--Transfer recording ability to Q.
 :silent! nnoremap <unique> Q q
@@ -1943,6 +1943,7 @@ let g:ycm_warning_symbol = '->'
 let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
 let g:ycm_always_populate_location_list = 1
 let g:ycm_echo_current_diagnostic = 1
+let g:ycm_key_invoke_completion = '<C-b>'
 " Under ubuntu, without defining ycm_server_python_interpreter will cause ycm shutdown.
 if OS !~ "Darwin.*"
 	let g:ycm_server_python_interpreter = '/usr/bin/python'
