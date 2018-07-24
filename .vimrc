@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2018-07-18 21:16:50
+"      LastModified                : 2018-07-24 15:28:03
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1748,7 +1748,7 @@ func! s:AddFrame_h()
 	let filename = expand('%')
 	let lastDotPos = strridx(filename, '.')
 	let filename = filename[0:lastDotPos-1] . '_' . filename[lastDotPos+1:]
-	call append(line('$')-1, "")
+"	call append(line('$')-1, "")
 	call append(line('$')-1, printf("#ifndef _%s_", toupper(filename)))
 	call append(line('$')-1, printf("#define _%s_", toupper(filename)))
 	call append(line('$')-1, "")
