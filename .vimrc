@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2018-07-24 15:28:03
+"      LastModified                : 2018-08-06 18:31:14
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -160,8 +160,13 @@ endfunc
 " 	*
 "	*/
 " to current cursor position. Other filetype use it probably will cause a glitch.
-:silent! nnoremap <unique> <Leader>p o/*<CR><BS><BS>*<CR>*/<ESC>kA<Space>
-:silent! inoremap <unique> <C-p> /*<CR><BS><BS>*<CR>*/<Up><Space>
+if &filetype == 'go'
+	:silent! nnoremap <unique> <Leader>p o/*<CR><Space>*<CR>*/<Up><Space>
+	:silent! inoremap <unique> <C-p> /*<CR><Space>*<CR>*/<Up><Space>
+else
+	:silent! nnoremap <unique> <Leader>p o/*<CR><BS><BS>*<CR>*/<ESC>kA<Space>
+	:silent! inoremap <unique> <C-p> /*<CR><BS><BS>*<CR>*/<Up><Space>
+endif
 " Add single line comment to current position or start a commented new line.
 " It support multiple filetypes. If encountered unknown filetype, it will do
 " nothing but show errmsg.
@@ -1577,8 +1582,8 @@ augroup vim_config
 augroup end
 
 " (19) Adding empty lines. Above and below.
-:silent! nnoremap <unique> [<Space> :<C-u>put! =repeat(nr2char(10), v:count1)<CR>
-:silent! nnoremap <unique> ]<Space> :<C-u>put =repeat(nr2char(10), v:count1)<CR>
+:silent! nnoremap <silent> <unique> [<Space> :<C-u>put! =repeat(nr2char(10), v:count1)<CR>
+:silent! nnoremap <silent> <unique> ]<Space> :<C-u>put =repeat(nr2char(10), v:count1)<CR>
 
 " (20) Remove trailing chars before line end. Auto triggerred after buffer be loaded
 " 		and before buffer be writen.
