@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2018-08-06 18:31:14
+"      LastModified                : 2018-08-06 19:38:22
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -159,14 +159,28 @@ endfunc
 "  /*
 " 	*
 "	*/
-" to current cursor position. Other filetype use it probably will cause a glitch.
-if &filetype == 'go'
-	:silent! nnoremap <unique> <Leader>p o/*<CR><Space>*<CR>*/<Up><Space>
-	:silent! inoremap <unique> <C-p> /*<CR><Space>*<CR>*/<Up><Space>
-else
-	:silent! nnoremap <unique> <Leader>p o/*<CR><BS><BS>*<CR>*/<ESC>kA<Space>
-	:silent! inoremap <unique> <C-p> /*<CR><BS><BS>*<CR>*/<Up><Space>
-endif
+" to current cursor position.
+:silent! nnoremap <unique> <Leader>p :call <SID>addDescription()<CR>
+:silent! inoremap <unique> <C-p> <C-R>=<SID>addDescription()<CR><BS><Space>
+
+func! s:addDescription()
+	let cur_col = getpos('.')[2]
+	if mode() == 'n'
+		normal ox
+	endif
+	let prevLine = getline('.')
+	let prevLine = prevLine[0:len(prevLine)-2]
+	echo prevLine
+	let lnr = line('.')
+	let line1 = prevLine . "/*"
+	let line2 = prevLine . " * "
+	let line3 = prevLine . " */"
+	call setline(lnr, line1)
+	call append(lnr, line2)
+	call append(lnr+1, line3)
+	call cursor(lnr+1, len(prevLine)+3)
+endfunc
+
 " Add single line comment to current position or start a commented new line.
 " It support multiple filetypes. If encountered unknown filetype, it will do
 " nothing but show errmsg.
