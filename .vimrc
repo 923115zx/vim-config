@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2018-08-06 19:38:22
+"      LastModified                : 2018-11-15 12:05:18
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1703,6 +1703,7 @@ endfunc
 "	FileReadPre/FileReadPost----any other file read.
 augroup vim_config
 	autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+	autocmd FileType cpp set syntax=cpp.doxygen
 "	autocmd BufNewFile * :call <SID>CreateFile()
 	autocmd BufNewFile * :call <SID>CreateTitle()
 	autocmd BufNewFile *.py :call <SID>AddFrame_py()
@@ -2005,8 +2006,11 @@ let g:syntastic_go_checkers = ['go']
 
 " (7) vim-go
 " annoying
+let g:go_gocode_autobuild = 0	" no use.
 let g:go_fmt_autosave = 0
-let g:go_gocode_autobuild = 0
+let g:godef_split=2
+let g:godef_same_file_in_same_window=1
+"autocmd FileType go nnoremap <buffer> <C-]> :call GodefUnderCursor()<cr>
 
 " +----------------------------------------------------------------------+
 " |                             PLUGINS END                              |
@@ -2018,7 +2022,7 @@ let g:go_gocode_autobuild = 0
 " Copy from Damian Conway's artical. Start to learn regex pattern.
 func! AlignAssignments ()
 	" Patterns needed to locate assignment operators...
-	let ASSIGN_OP   = '[-+*/%|&]\?=\@<!=[=~]\@!'
+	let ASSIGN_OP   = '[-+*/%|&:]\?=\@<!=[=~]\@!'
 	let ASSIGN_LINE = '^\(.\{-}\)\s*\(' . ASSIGN_OP . '\)\(.*\)$'
 
 	" Locate block of code to be considered (same indentation, no blanks)...
