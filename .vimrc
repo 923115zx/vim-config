@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2018-11-15 12:05:18
+"      LastModified                : 2019-01-23 11:56:19
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1709,6 +1709,7 @@ augroup vim_config
 	autocmd BufNewFile *.py :call <SID>AddFrame_py()
 	autocmd BufNewFile *.sh :call <SID>AddFrame_sh()
 	autocmd BufNewFile *.h :call <SID>AddFrame_h()
+	autocmd BufWinEnter *.go if &filetype == '' | set filetype=cpp | endif
 "	autocmd BufNewFile *.asm :call BuildSandbox()
 	autocmd BufWritePre,FileWritePre * let cur_pos__=getpos('.')
 			\|call <SID>LastModFresh()|call setpos('.', cur_pos__)
