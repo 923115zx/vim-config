@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2019-01-23 11:56:19
+"      LastModified                : 2019-03-26 16:37:04
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -168,6 +168,7 @@ func! s:addDescription()
 	if mode() == 'n'
 		normal ox
 	endif
+	normal x
 	let prevLine = getline('.')
 	let prevLine = prevLine[0:len(prevLine)-2]
 	echo prevLine
@@ -2069,3 +2070,4 @@ endfunc
 " 1. Improve scb performence.
 " 2. Seperate .h preaccess out from CreateFile(), and add it into TitleSetter as a new autocmd.
 " 3. Add c++ testfile preparation cmd, in order to replace what mktest.sh do.
+" 4. Change * and # performance. Don't need to search immediately, hl first.
