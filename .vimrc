@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2019-03-28 11:46:44
+"      LastModified                : 2019-04-01 16:20:05
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -116,6 +116,7 @@ set ttyfast
 " Using mouse on terminal. I don't need this.
 "set ttymouse=xterm
 "set mouse=a
+set helplang=en
 
 " Replace tab with spaces in python file.
 let s:defaultCinw = ""
@@ -376,10 +377,10 @@ endfunc
 " Using for visual maps.
 func! s:ToggleComments_visual()
 	" Goto the last line of the last selected visual area and get line num.
-	normal '>
+	normal `>
 	let last_line_nr = line(".")
 	" Goto the first line of the last selected visual area and get line num.
-	normal '<
+	normal `<
 	let first_line_nr = line(".")
 	call s:ToggleComments(first_line_nr, last_line_nr)
 endfunc
@@ -902,10 +903,10 @@ func! AddParentheseForSelect(lsymbol)
 		echo "Can't find paired close brace of [" . a:lsymbol . "]"
 		return
 	endif
-	normal '>
+	normal `>
 	let last_line_nr = line(".")
 	let last_col_nr = col(".")
-	normal '<
+	normal `<
 	let first_line_nr = line(".")
 	let first_col_nr = col(".")
 	if a:lsymbol == '{'
@@ -1238,8 +1239,12 @@ endfunc
 ":silent! nnoremap <unique> Q q
 " Toggle uppercase to lowercase or lowercase to uppercase.
 ":silent! nnoremap <unique> <expr> q ToupperOrTolower()
-:silent! nnoremap <unique> ` ~
-:silent! nnoremap <unique> q; q:
+
+" ` is different with ', '< and '> only remember line nr. ` remember pos.
+":silent! nnoremap <unique> ` ~
+" q: is disable, use c_CTRL-F to open cmd history.
+:silent! nnoremap <unique> q ~
+":silent! nnoremap <unique> q; q:
 " Make current word to upper case.
 :silent! nnoremap <unique> <silent> <Leader>q :let __pos=getpos(".")<CR>gUaw:call setpos('.', __pos)<CR>lh
 " Abandoned.
@@ -1479,9 +1484,9 @@ endfunc
 :command! -range De <line1>,<line2>call <SID>DeleteEmptyLines_range()
 
 func! s:DeleteEmptyLines_visual()
-	normal '>
+	normal `>
 	let last_line_nr = line(".")
-	normal '<
+	normal `<
 	let first_line_nr = line(".")
 	exe first_line_nr . "," . last_line_nr . "g/^\s*$/d"
 endfunc
@@ -1569,9 +1574,9 @@ endfunc
 :silent! vnoremap <unique> <silent> <Leader>k :<C-u>call MoveLines(1, v:count1)<CR>
 " Move block up or down.
 func! MoveLines(up, count1)
-	normal '>
+	normal `>
 	let last_line_nr = line('.')
-	normal '<
+	normal `<
 	let first_line_nr = line('.')
 	if a:up == 1
 		let up_or_down = '-1-'
