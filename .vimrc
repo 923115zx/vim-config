@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2019-04-01 16:20:05
+"      LastModified                : 2019-04-02 11:36:18
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1244,6 +1244,9 @@ endfunc
 ":silent! nnoremap <unique> ` ~
 " q: is disable, use c_CTRL-F to open cmd history.
 :silent! nnoremap <unique> q ~
+" Move q to t in cmod.
+:silent! cnoremap <unique> <Leader>/ <ESC>q/
+:silent! cnoremap <unique> <Leader>? <ESC>q?
 ":silent! nnoremap <unique> q; q:
 " Make current word to upper case.
 :silent! nnoremap <unique> <silent> <Leader>q :let __pos=getpos(".")<CR>gUaw:call setpos('.', __pos)<CR>lh
