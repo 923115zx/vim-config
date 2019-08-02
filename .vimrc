@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2019-08-02 16:44:51
+"      LastModified                : 2019-08-02 17:00:23
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1705,7 +1705,7 @@ endfunc
 :silent! vnoremap <C-p> "+p
 
 " (25) High light and search, but don't jump
-:silent! nnoremap * *''
+:silent! nnoremap <unique> <silent> * :let __pos=getpos(".")<CR>*:call setpos('.', __pos)<cr>
 
 " +----------------------------------------------------------------------+
 " |                        PIECEMEAL FEATURE END                         |
