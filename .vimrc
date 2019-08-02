@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2019-04-02 11:36:18
+"      LastModified                : 2019-08-02 16:44:51
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -1704,6 +1704,9 @@ endfunc
 :silent! nnoremap <C-p> "+p
 :silent! vnoremap <C-p> "+p
 
+" (25) High light and search, but don't jump
+:silent! nnoremap * *''
+
 " +----------------------------------------------------------------------+
 " |                        PIECEMEAL FEATURE END                         |
 " +----------------------------------------------------------------------+
@@ -1981,6 +1984,7 @@ let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
 let g:ycm_always_populate_location_list = 1
 let g:ycm_echo_current_diagnostic = 1
 let g:ycm_key_invoke_completion = '<C-b>'
+let g:ycm_max_diagnostics_to_display = 0
 " Under ubuntu, without defining ycm_server_python_interpreter will cause ycm shutdown.
 if OS !~ "Darwin.*"
 	let g:ycm_server_python_interpreter = '/usr/bin/python'
