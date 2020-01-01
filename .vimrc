@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2019-08-02 17:00:23
+"      LastModified                : 2020-01-01 15:35:47
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -17,6 +17,7 @@ set autoindent
 set smartindent
 set cindent
 set textwidth=256					" Actually seems don't need to set this.
+set colorcolumn=81
 set ignorecase smartcase
 set nu
 set showmatch
@@ -37,8 +38,11 @@ if &t_Co > 2 || has("gui_running")
 	let g:solarized_termcolors=256
 endif
 " Want to change cursor shape to vertical bar when entering imode, and turn to
-" block when return back to normal mode. Not work in xshell.
-if &term =~ "xterm"
+" block when return back to normal mode. Not work in xshell. And if you
+" secureCRT with using XTerm color, it cause annoying bug. So let it only
+" effects on MacOS.
+let OS = system("\uname")
+if OS =~ "Darwin.*" && &term =~ "xterm"
 	let &t_SI = "\<ESC>]50;CursorShape=1\x7"
 	let &t_EI = "\<ESC>]50;CursorShape=0\x7"
 endif
@@ -117,22 +121,20 @@ set ttyfast
 "set ttymouse=xterm
 "set mouse=a
 set helplang=en
+set expandtab
+set smarttab
 
 " Replace tab with spaces in python file.
 let s:defaultCinw = ""
 augroup vim_config
 	au!
 	autocmd InsertEnter *.py let s:defaultCinw = &cinwords |
-				\ set expandtab |
-				\ set smarttab |
 				\ set cinwords=if,elif,else,for,while,try,except,finally,def,class
-	autocmd InsertLeave *.py set noexpandtab |
-				\ set nosmarttab |
-				\ set cinwords=s:defaultCinw |
-				\ let save_cursor = getpos(".") |
-				\ let save_cursor[2] = save_cursor[2] + s:tab2space() |
-				\ :silent! %s/^ *\zs\t\+\ze\S/\=substitute(submatch(0), "\t", repeat("\<Space>", &tabstop), "g")/g |
-				\ :call setpos('.', save_cursor)
+	autocmd InsertLeave *.py set cinwords=s:defaultCinw |
+"				\ let save_cursor = getpos(".") |
+"				\ let save_cursor[2] = save_cursor[2] + s:tab2space() |
+"				\ :silent! %s/^ *\zs\t\+\ze\S/\=substitute(submatch(0), "\t", repeat("\<Space>", &tabstop), "g")/g |
+"				\ :call setpos('.', save_cursor)
 augroup end
 
 " Return 3 times of the number that how many tabs in ahead of current line.
@@ -801,7 +803,6 @@ call s:RegisterPairedSymbols()
 " 		will send crtl-h. That's the old style terminal default option. And iterm2
 " 		in darwin is new, it send ^?. You could change the setting in xshell, then
 " 		just use <BS> here and ok.
-let OS = system("\uname")
 " We just map <BS> and <C-h> both. I think I will never want to map <C-h> to do other
 " thing.
 :silent! inoremap <unique> <silent> <BS> <C-R>=DeletePairedSymbols()<CR>
@@ -1653,8 +1654,10 @@ augroup vim_config
 	autocmd WinEnter * set cursorline | set cursorcolumn
 	autocmd WinLeave * set nocursorline | set nocursorcolumn
 	autocmd InsertEnter * call GetCursorLineHl() | call GetCorrectBgs() |
-				\ exe "hi CursorLine " . s:ctermbg " " . s:guibg
+				\ exe "hi CursorLine " . s:ctermbg " " . s:guibg |
+				\ exe "hi CursorColumn " . s:ctermbg " " . s:guibg
 	autocmd InsertLeave * exe "hi " . s:cursorlinehl
+    autocmd InsertLeave * exe "hi CursorColumn " . s:cursorlinehl[len("CursorLine"):]
 augroup end
 
 " Get normal mode cursorline highlight setting.
@@ -1705,7 +1708,11 @@ endfunc
 :silent! vnoremap <C-p> "+p
 
 " (25) High light and search, but don't jump
-:silent! nnoremap <unique> <silent> * :let __pos=getpos(".")<CR>*:call setpos('.', __pos)<cr>
+:silent! nnoremap <unique> <silent> * :call <SID>searchCword()<CR>:set hlsearch<CR>
+
+func! s:searchCword()
+    let @/ = '\<' . expand("<cword>") . '\>'
+endfunc
 
 " +----------------------------------------------------------------------+
 " |                        PIECEMEAL FEATURE END                         |
@@ -1723,6 +1730,7 @@ endfunc
 augroup vim_config
 	autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 	autocmd FileType cpp set syntax=cpp.doxygen
+    autocmd FileType cpp :syn keyword cTodo contained NOTE
 "	autocmd BufNewFile * :call <SID>CreateFile()
 	autocmd BufNewFile * :call <SID>CreateTitle()
 	autocmd BufNewFile *.py :call <SID>AddFrame_py()
@@ -1951,6 +1959,7 @@ if has("cscope")
 		"echo  cscope_file
 		if !empty(cscope_file) && filereadable(cscope_file)
 			exe "cs add " cscope_file
+"            echo "load cscope.out"
 		endif
 	endif
 endif
@@ -1985,6 +1994,7 @@ let g:ycm_always_populate_location_list = 1
 let g:ycm_echo_current_diagnostic = 1
 let g:ycm_key_invoke_completion = '<C-b>'
 let g:ycm_max_diagnostics_to_display = 0
+
 " Under ubuntu, without defining ycm_server_python_interpreter will cause ycm shutdown.
 if OS !~ "Darwin.*"
 	let g:ycm_server_python_interpreter = '/usr/bin/python'
@@ -2001,6 +2011,8 @@ endif
 " (4) Colorscheme
 " TODO: Add airline refresh to background change and contrast change.
 color modified_solarized
+"hi ColorColumn term=reverse cterm=reverse ctermfg=124 guifg=white guibg=red
+"hi ColorColumn term=reverse cterm=reverse ctermfg=166
 
 " [----Powerline----]	(Abandoned, replaced by airline.) {{{
 "let g:Powerline_symbols = 'fancy'
