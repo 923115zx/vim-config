@@ -4,7 +4,7 @@
 "      Author                      : Zhao Xin
 "      CreateTime                  : 2017-08-16 11:35:31 AM
 "      VIM                         : ts=4, sw=4
-"      LastModified                : 2020-01-01 15:35:47
+"      LastModified                : 2021-09-08 14:08:21
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -123,6 +123,7 @@ set ttyfast
 set helplang=en
 set expandtab
 set smarttab
+set modeline
 
 " Replace tab with spaces in python file.
 let s:defaultCinw = ""
@@ -130,7 +131,7 @@ augroup vim_config
 	au!
 	autocmd InsertEnter *.py let s:defaultCinw = &cinwords |
 				\ set cinwords=if,elif,else,for,while,try,except,finally,def,class
-	autocmd InsertLeave *.py set cinwords=s:defaultCinw |
+	autocmd InsertLeave *.py set cinwords=s:defaultCinw
 "				\ let save_cursor = getpos(".") |
 "				\ let save_cursor[2] = save_cursor[2] + s:tab2space() |
 "				\ :silent! %s/^ *\zs\t\+\ze\S/\=substitute(submatch(0), "\t", repeat("\<Space>", &tabstop), "g")/g |
@@ -1095,17 +1096,17 @@ call AddCom( '^\s*for',           s:EOL,  "  in ___\n___\nendfor" . Repeat("\<UP
 call AddCom( '^\s*while',         s:EOL,  " \n___\nendwhile\<UP>\<UP>",                               {'filetype' : 'vim'} )
 
 " CPP sematic complete.
-call AddCom( '^\s*\(if\|else if\)',     s:EOL,  " ()\n{\n___\n}" . Repeat("\<UP>" , 3 , "\<RIGHT>" , 9, "\<LEFT>", 1),  {'filetype' : 'c,cpp,java'} )
-call AddCom( '^\s*ifs\%[imple]',        s:EOL,  "\<C-w>if ()\n___\<UP>\<LEFT>",                                         {'filetype' : 'c,cpp,java'} )
-call AddCom( '^\s*else ifs\%[imple]',   s:EOL,  "\<C-w>\<C-w>else if ()\n___\<UP>" . Repeat("\<RIGHT>", 2),             {'filetype' : 'c,cpp,java'} )
-call AddCom( '^\s*else',                s:EOL,  "\n{\n-\n}\<UP>\<RIGHT>\<DEL>",                                         {'filetype' : 'c,cpp,java'} )
-call AddCom( '^\s*for',                 s:EOL,  " (; ___; ___)\n{\n___\n}" . Repeat("\<UP>" , 3 , "\<RIGHT>" , 4),      {'filetype' : 'c,cpp,java'} )
-call AddCom( '^\s*fore\%[ach]',         s:EOL,  "\<C-W>for ( : ___)\n{\n___\n}" . Repeat("\<UP>" , 3 , "\<RIGHT>" , 4), {'filetype' : 'c,cpp,java'} )
-call AddCom( '^\s*while',               s:EOL,  " ()\n{\n___\n}" . Repeat("\<UP>", 3, "\<RIGHT>", 6),                   {'filetype' : 'c,cpp,java'} )
-call AddCom( '^\s*do',                  s:EOL,  "\n{\n-\n} while (___);\<UP>\<BS>",                                     {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*\(if\|}\+\s\+else if\)',     s:EOL,  " () {\n___\n}" . Repeat("\<UP>" , 2 , "\<RIGHT>" , 19, "\<LEFT>", 3),  {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*ifs\%[imple]',               s:EOL,  "\<C-w>if ()\n___\<UP>\<LEFT>",                                         {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*}\+\s\+else ifs\%[imple]',   s:EOL,  "\<C-w>\<C-w>else if ()\n___\<UP>" . Repeat("\<RIGHT>", 4),             {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*}\+\s\+else',                s:EOL,  " {\n-\n}\<UP>\<RIGHT>\<RIGHT>\<RIGHT>\<DEL>",                          {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*for',                        s:EOL,  " (; ___; ___) {\n___\n}" . Repeat("\<UP>" , 2 , "\<RIGHT>" , 4),       {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*fore\%[ach]',                s:EOL,  "\<C-W>for ( : ___) {\n___\n}" . Repeat("\<UP>" , 2 , "\<RIGHT>" , 4),  {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*while',                      s:EOL,  " () {\n___\n}" . Repeat("\<UP>", 2, "\<RIGHT>", 6),                    {'filetype' : 'c,cpp,java'} )
+call AddCom( '^\s*do',                         s:EOL,  " {\n-\n} while (___);\<UP>\<BS>",                                      {'filetype' : 'c,cpp,java'} )
 call AddCom( '^\s*switch',
 			\ s:EOL,
-			\ " ()\n{\n".Repeat("case ___:\n___\n\<C-D>\<C-D>break;\n", 3)."default:\n___\n\<C-D>\<C-D>break;\n}".Repeat("\<UP>", 14, "\<RIGHT>", 7),
+            \ " () {\ncase ___:\n\<C-D>{\n___\n\<C-D>\<C-D>} break;\n".Repeat("case ___:\n{\n___\n\<C-D>\<C-D>} break;\n", 2)."default:\n{\n___\n\<C-D>\<C-D>} break;\n}".Repeat("\<UP>", 17, "\<RIGHT>", 7),
 			\ {'filetype' : 'c,cpp,java'} )
 
 " Shell sematic complete.
@@ -1246,8 +1247,8 @@ endfunc
 " q: is disable, use c_CTRL-F to open cmd history.
 :silent! nnoremap <unique> q ~
 " Move q to t in cmod.
-:silent! cnoremap <unique> <Leader>/ <ESC>q/
-:silent! cnoremap <unique> <Leader>? <ESC>q?
+:silent! cnoremap <unique> <C-t>/ <ESC>q/
+:silent! cnoremap <unique> <C-t>? <ESC>q?
 ":silent! nnoremap <unique> q; q:
 " Make current word to upper case.
 :silent! nnoremap <unique> <silent> <Leader>q :let __pos=getpos(".")<CR>gUaw:call setpos('.', __pos)<CR>lh
@@ -1507,7 +1508,15 @@ func! GetCol()
 "	let l:cur_off = cur_pos[3]
 "	echo "lnum=" . cur_lnum . ", col=" . cur_col . ", off=" . cur_off
 
-	echo "screencol = " . screencol()
+"	echo "screencol = " . screencol()
+    echo expand("%")
+    let self = expand("%") . "bak"
+    let path = findfile(self, ".")
+    if path == ""
+        echo "not found " . path
+    else
+        echo "found " . path
+    endif
 
 "	let l:cur_col = cur_pos[2]
 "	let l:cur_line_text = getline('.')
@@ -1701,7 +1710,7 @@ endfunc
 " (In rhel, you could set an alias for vimx to vim.)
 
 " Remote copy: TODO
-"
+"set clipboard^=unnamed,unnamedplus
 :silent! nnoremap <C-c> "+yy
 :silent! vnoremap <C-c> "+y
 :silent! nnoremap <C-p> "+p
@@ -1712,6 +1721,49 @@ endfunc
 
 func! s:searchCword()
     let @/ = '\<' . expand("<cword>") . '\>'
+endfunc
+
+" (26) Open .h or .cc file
+:silent! nnoremap <unique> <silent> <Leader>w :call OpenSibling('vsp')<CR>
+:silent! nnoremap <unique> <silent> <Leader>g :call OpenSibling('sp')<CR>
+
+func! OpenSibling(split_)
+    let current = expand("%")
+    let dotpos = strridx(current, ".")
+    if dotpos == -1
+        echo "not code file"
+        return
+    endif
+    let suffix = strpart(current, dotpos+1)
+    let prefix = strpart(current, 0, dotpos)
+    if suffix == "cc" || suffix == "cpp" || suffix == "c"
+        let hfile = prefix . ".h"
+        exe ":" . a:split_ . " " . hfile
+        return
+    endif
+    if suffix != "h"
+        echo "not c/cpp file"
+        return
+    endif
+    let cfile = prefix . ".c"
+    let path = findfile(cfile, ".")
+    if path != ""
+        exe ":" . a:split_ . " " . cfile
+        return
+    endif
+    let ccfile = prefix . ".cc"
+    let path = findfile(ccfile, ".")
+    if path != ""
+        exe ":" . a:split_ . " " . ccfile
+        return
+    endif
+    let cppfile = prefix . ".cpp"
+    let path = findfile(cppfile, ".")
+    if path != ""
+        exe ":" . a:split_ . " " . cppfile
+        return
+    endif
+    echo "not found in current directory"
 endfunc
 
 " +----------------------------------------------------------------------+
@@ -2044,6 +2096,11 @@ let g:go_fmt_autosave = 0
 let g:godef_split=2
 let g:godef_same_file_in_same_window=1
 "autocmd FileType go nnoremap <buffer> <C-]> :call GodefUnderCursor()<cr>
+
+" (8) rust
+"let g:ycm_rust_src_path="/usr/lib/rustlib/src/rust/library"
+let g:rustc_path = '/usr/bin/rustc'
+let g:ftplugin_rust_source_path = '/usr/bin/rustlib/src/rust'
 
 " +----------------------------------------------------------------------+
 " |                             PLUGINS END                              |
